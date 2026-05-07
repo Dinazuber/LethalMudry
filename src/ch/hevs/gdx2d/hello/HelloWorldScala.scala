@@ -2,7 +2,7 @@ package ch.hevs.gdx2d.hello
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.math.Interpolation
-import ch.hevs.gdx2d.components.bitmaps.BitmapImage
+import ch.hevs.gdx2d.components.bitmaps.{BitmapImage, Spritesheet}
 import ch.hevs.gdx2d.lib.GdxGraphics
 import ch.hevs.gdx2d.desktop.PortableApplication
 
@@ -21,13 +21,24 @@ object HelloWorldScala {
 }
 
 class HelloWorldScala extends PortableApplication {
-  private var imgBitmap: BitmapImage = null
+  private var imgBitmap: BitmapImage = _
+  private var imgBackground: BitmapImage = _
+  private var ss: Spritesheet = _
+  private var FRAME_TIME = 0.15 //Duration of one frame
+  private var SPRITE_WIDTH = 64
+  private var SPRITE_HEIGHT = 64
+  var dt: Float = 0
+
+  var textureX: Int = 0
+  var textureY: Int = 1
 
   override def onInit(): Unit = {
-    setTitle("Hello World - mui 2024")
+    setTitle("LethalMudry")
 
     // Load a custom image (or from the lib "res/lib/icon64.png")
     imgBitmap = new BitmapImage("data/images/ISC_logo.png")
+    imgBackground = new BitmapImage("data/images/map.png")
+    ss = new Spritesheet("data/images/sacha_walking.png", SPRITE_WIDTH, SPRITE_HEIGHT)
   }
 
   /**
@@ -35,9 +46,11 @@ class HelloWorldScala extends PortableApplication {
    */
   private var direction: Int = 1
   private var currentTime: Float = 0
+  private var currentFrame: Int = 0
   final private val ANIMATION_LENGTH: Float = 2f // Animation length (in seconds)
   final private val MIN_ANGLE: Float = -20
   final private val MAX_ANGLE: Float = 20
+  var nFrames: Int = 4
 
   /**
    * This method is called periodically by the engine
@@ -47,15 +60,18 @@ class HelloWorldScala extends PortableApplication {
   override def onGraphicRender(g: GdxGraphics): Unit = {
     // Clears the screen
     g.clear()
-    // Compute the angle of the image using an elastic interpolation
-    val t = computePercentage
-    val angle: Float = Interpolation.sine.apply(MIN_ANGLE, MAX_ANGLE, t)
-
-    // Draw everything
-    g.drawTransformedPicture(getWindowWidth / 2.0f, getWindowHeight / 2.0f, angle, 0.7f, imgBitmap)
-    g.drawStringCentered(getWindowHeight * 0.8f, "Welcome to gdx2d !")
+    //Draw the FPS
     g.drawFPS()
-    g.drawSchoolLogo()
+    // Compute the angle of the image using an elastic interpolation
+    dt += Gdx.graphics.getDeltaTime
+
+    if(dt > FRAME_TIME){
+      dt = 0
+      currentFrame = (currentFrame + 1) % nFrames
+    }
+
+    // Display the current image of the animation
+    g.draw(ss.sprites(textureY)(currentFrame), getWindowHeight/2, getWindowHeight/2)
   }
 
   /**
