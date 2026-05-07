@@ -62,6 +62,8 @@ class HelloWorldScala extends PortableApplication {
     g.clear()
     //Draw the FPS
     g.drawFPS()
+    //Draw background
+    g.drawPicture(getWindowWidth /2 , getWindowHeight /2, imgBackground)
     // Compute the angle of the image using an elastic interpolation
     dt += Gdx.graphics.getDeltaTime
 
