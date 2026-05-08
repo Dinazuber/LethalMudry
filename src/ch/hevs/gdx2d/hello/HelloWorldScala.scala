@@ -5,6 +5,9 @@ import com.badlogic.gdx.math.Interpolation
 import ch.hevs.gdx2d.components.bitmaps.{BitmapImage, Spritesheet}
 import ch.hevs.gdx2d.lib.GdxGraphics
 import ch.hevs.gdx2d.desktop.PortableApplication
+import com.badlogic.gdx.Input
+
+import java.awt.Frame
 
 
 /**
@@ -24,9 +27,9 @@ class HelloWorldScala extends PortableApplication {
   private var imgBitmap: BitmapImage = _
   private var imgBackground: BitmapImage = _
   private var ss: Spritesheet = _
-  private var FRAME_TIME = 0.15 //Duration of one frame
-  private var SPRITE_WIDTH = 64
-  private var SPRITE_HEIGHT = 64
+  private var FRAME_TIME = 0.15f //Duration of one frame
+  private var SPRITE_WIDTH = 128
+  private var SPRITE_HEIGHT = 128
   var dt: Float = 0
 
   var textureX: Int = 0
@@ -38,7 +41,7 @@ class HelloWorldScala extends PortableApplication {
     // Load a custom image (or from the lib "res/lib/icon64.png")
     imgBitmap = new BitmapImage("data/images/ISC_logo.png")
     imgBackground = new BitmapImage("data/images/map.png")
-    ss = new Spritesheet("data/images/sacha_walking.png", SPRITE_WIDTH, SPRITE_HEIGHT)
+    ss = new Spritesheet("data/images/lethalcompany.png", SPRITE_WIDTH, SPRITE_HEIGHT)
   }
 
   /**
@@ -47,11 +50,17 @@ class HelloWorldScala extends PortableApplication {
   private var direction: Int = 1
   private var currentTime: Float = 0
   private var currentFrame: Int = 0
+  private var isWalking: Boolean = false
+  private var line = 0
+  private var col = 0
   final private val ANIMATION_LENGTH: Float = 2f // Animation length (in seconds)
   final private val MIN_ANGLE: Float = -20
   final private val MAX_ANGLE: Float = 20
   var nFrames: Int = 4
 
+  var posX: Float = 400.0f      // Position X de départ
+  var posY: Float = 300.0f      // Position Y de départ
+  val speed: Float = 200.0f     // Vitesse de déplacement (pixels/sec)
   /**
    * This method is called periodically by the engine
    *
@@ -64,16 +73,53 @@ class HelloWorldScala extends PortableApplication {
     g.drawFPS()
     //Draw background
     g.drawPicture(getWindowWidth /2 , getWindowHeight /2, imgBackground)
-    // Compute the angle of the image using an elastic interpolation
-    dt += Gdx.graphics.getDeltaTime
 
-    if(dt > FRAME_TIME){
+    val delta = Gdx.graphics.getDeltaTime
+    val move = speed * delta
+    isWalking = false
+    var selectedIdx: Int = 0
+
+    // BAS
+    if (Gdx.input.isKeyPressed(com.badlogic.gdx.Input.Keys.S)) {
+      posY -= move
+      line = 0
+      col = 0
+    }
+    // HAUT
+    else if (Gdx.input.isKeyPressed(com.badlogic.gdx.Input.Keys.W)) {
+      posY += move
+      line = 0
+      col = 1
+    }
+    // GAUCHE
+    else if (Gdx.input.isKeyPressed(com.badlogic.gdx.Input.Keys.A)) {
+      posX -= move
+      line = 1
+      col = 0
+    }
+    // DROITE
+    else if (Gdx.input.isKeyPressed(com.badlogic.gdx.Input.Keys.D)) {
+      posX += move
+      line = 1
+      col = 1
+    }
+    if (isWalking){
+      // Compute the angle of the image using an elastic interpolation
+      dt += delta
+
+      if(dt > FRAME_TIME){
+        dt = 0
+        currentFrame = (currentFrame + 1) % 2
+      }
+    }else{
+      currentFrame = 0
       dt = 0
-      currentFrame = (currentFrame + 1) % nFrames
     }
 
+
+
     // Display the current image of the animation
-    g.draw(ss.sprites(textureY)(currentFrame), getWindowHeight/2, getWindowHeight/2)
+    g.draw(ss.sprites(line)(col), posX, posY)
   }
 
   /**
