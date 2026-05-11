@@ -3,6 +3,8 @@ import com.badlogic.gdx.Gdx
 package MovementLogic {
 
   class MovementLogic {
+    private var refTimeSprite = System.currentTimeMillis()
+    private val conditionSwapSprite: Int = 250
     private var dt: Float = 0
     private val FRAME_TIME = 0.15f
     private var direction: Int = 1
@@ -36,7 +38,12 @@ package MovementLogic {
 
     final private val ANIMATION_LENGTH: Float = 2f
     val speed: Float = 150.0f
-    val toggle = Iterator.continually(List(0, 1)).flatten
+
+    // Toggle between spriteSheets values
+    val toggleUp = Iterator.continually(List(1, 2)).flatten
+    val toggleDown = Iterator.continually(List(0, 3)).flatten
+    val toggleLeft = Iterator.continually(List(0, 1)).flatten
+    val toggleRight = Iterator.continually(List(2, 3)).flatten
 
     def update(): Unit = {
       val delta = Gdx.graphics.getDeltaTime
@@ -46,25 +53,38 @@ package MovementLogic {
       if (Gdx.input.isKeyPressed(com.badlogic.gdx.Input.Keys.S)) {
         posY -= move
         line = 0
-        col = 0
+        if (System.currentTimeMillis() - refTimeSprite >= conditionSwapSprite) {
+          col = toggleDown.next()
+          refTimeSprite = System.currentTimeMillis()
+        }
         isWalking = true
       }
+
       else if (Gdx.input.isKeyPressed(com.badlogic.gdx.Input.Keys.W)) {
         posY += move
         line = 0
-        col = 1
+        if (System.currentTimeMillis() - refTimeSprite >= conditionSwapSprite) {
+          col = toggleUp.next()
+          refTimeSprite = System.currentTimeMillis()
+        }
         isWalking = true
       }
       else if (Gdx.input.isKeyPressed(com.badlogic.gdx.Input.Keys.A)) {
         posX -= move
         line = 1
-        col = toggle.next()
+        if (System.currentTimeMillis() - refTimeSprite >= conditionSwapSprite) {
+          col = toggleLeft.next()
+          refTimeSprite = System.currentTimeMillis()
+        }
         isWalking = true
       }
       else if (Gdx.input.isKeyPressed(com.badlogic.gdx.Input.Keys.D)) {
         posX += move
         line = 1
-        col = 1
+        if (System.currentTimeMillis() - refTimeSprite >= conditionSwapSprite) {
+          col = toggleRight.next()
+          refTimeSprite = System.currentTimeMillis()
+        }
         isWalking = true
       }
 

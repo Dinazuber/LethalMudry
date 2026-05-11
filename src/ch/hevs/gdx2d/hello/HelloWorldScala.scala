@@ -22,8 +22,7 @@ object HelloWorldScala {
 class HelloWorldScala extends PortableApplication {
   private var imgBitmap: BitmapImage = _
   private var imgBackground: BitmapImage = _
-  private var ssLeft: Spritesheet = _
-  private var ssRight: Spritesheet = _
+  private var ss: Spritesheet = _
   private val SPRITE_WIDTH = 128
   private val SPRITE_HEIGHT = 128
   val mvLogic: MovementLogic = new MovementLogic
@@ -34,8 +33,7 @@ class HelloWorldScala extends PortableApplication {
     // Load a custom image (or from the lib "res/lib/icon64.png")
     imgBitmap = new BitmapImage("data/images/ISC_logo.png")
     imgBackground = new BitmapImage("data/images/map.png")
-    ssLeft = new Spritesheet("data/images/lethalcompany.png", SPRITE_WIDTH, SPRITE_HEIGHT)
-    ssRight = new Spritesheet("data/images/lethalcompanyRevert.png", SPRITE_WIDTH,SPRITE_HEIGHT)
+    ss = new Spritesheet("data/images/lethalCompanyFull.png", SPRITE_WIDTH, SPRITE_HEIGHT)
   }
 
   /**
@@ -53,7 +51,6 @@ class HelloWorldScala extends PortableApplication {
     // update MovementLogic
     mvLogic.update()
     // Display the current image of the animation
-    g.draw(ssLeft.sprites(mvLogic.line)(mvLogic.col), mvLogic.posX, mvLogic.posY)
+    g.draw(ss.sprites(mvLogic.line)(mvLogic.col), mvLogic.posX, mvLogic.posY)
   }
-
 }
