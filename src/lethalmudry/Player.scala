@@ -1,92 +1,82 @@
-package lethalmudry {
+package ch.hevs.gdx2d.lethalmudry
 
-  import ch.hevs.gdx2d.lib.GdxGraphics
-  import com.badlogic.gdx.graphics.Texture
-  import com.badlogic.gdx.graphics.g2d.TextureRegion
+import ch.hevs.gdx2d.lib.GdxGraphics
+import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.TextureRegion
+import lethalmudry.LevelManager
 
-  class Player(texture: Texture, startX: Float, startY: Float, level: LevelManager) {
-    private val SPRITE_WIDTH = 128
-    private val SPRITE_HEIGHT = 128
-    private val FRAMES: Array[Array[TextureRegion]] = TextureRegion.split(texture, SPRITE_WIDTH, SPRITE_HEIGHT)
+class Player(texture: Texture, startX: Float, startY: Float, level: LevelManager) {
+  private val SPRITE_WIDTH  = 85
+  private val SPRITE_HEIGHT = 120
 
-    var x: Float = startX
-    var y: Float = startY
-    val speed: Float = 150
+  // Découpe la spritesheet en grille de TextureRegion
+  private val FRAMES: Array[Array[TextureRegion]] =
+    TextureRegion.split(texture, SPRITE_WIDTH, SPRITE_HEIGHT)
 
-    var stateTime: Float = 0f
-    val frameDuration: Float = 250f
-    val nFrames: Int = 2
+  var x: Float = startX
+  var y: Float = startY
+  val speed: Float = 150f
 
-    var currentDirection: Int = 10
-    var isMoving: Boolean = false
+  var stateTime: Float  = 0f
+  val frameDuration: Float = 0.25f  // en secondes (était en ms avant, corrigé)
+  val nFrames: Int = 2
 
-    val hitWidth = 128
-    val hitHeight = 128
-    val hitOffsetX = 100f
-    val hitOffsetY = 100f
+  // Direction initiale : ligne 0, col 0 (sécurisé)
+  var currentRow: Int    = 0
+  var currentCol: Int    = 0
+  var isMoving: Boolean  = false
 
+  val hitWidth   = 64f
+  val hitHeight  = 64f
+  val hitOffsetX = 32f
+  val hitOffsetY = 0f
 
-    def update(deltaTime: Float, dx: Float, dy: Float): Unit = {
+  def update(deltaTime: Float, dx: Float, dy: Float): Unit = {
+    if (dx != 0 || dy != 0) {
+      isMoving = true
+      stateTime += deltaTime
 
-      if (dx != 0 || dy != 0) {
-        isMoving = true
-        stateTime += deltaTime
+      // Choix de la ligne de la spritesheet selon la direction
+      // Adapte ces indices selon ta spritesheet lethalCompanyFull.png
+      if      (dy < 0) { currentRow = 3 }  // bas (S)
+      else if (dy > 0) { currentRow = 0 }  // haut (W)
+      else if (dx < 0) { currentRow = 2 }  // gauche (A)
+      else if (dx > 0) { currentRow = 1 }  // droite (D)
 
-        if (dx > 0) {
-          currentDirection = 11
-        } // right
-        else if (dx < 0) {
-          currentDirection = 9
-        } // left
-        else if (dy > 0) {
-          currentDirection = 8
-        } // up
-        else if (dy < 0) {
-          currentDirection = 10
-        } // down
+      // Alterne entre les frames d'animation
+      currentCol = (stateTime / frameDuration).toInt % nFrames
 
-        var futurX = x + dx * speed * deltaTime
-        var futurY = y + dy * speed * deltaTime
+      // Calcul du mouvement avec collisions axe par axe
+      val futurX = x + dx * speed * deltaTime
+      val futurY = y + dy * speed * deltaTime
 
-        if (!isHitboxColliding(futurX, y, level)) {
-          x = futurX
-        }
+      if (!isHitboxColliding(futurX, y)) { x = futurX }
+      if (!isHitboxColliding(x, futurY)) { y = futurY }
 
-        if (!isHitboxColliding(x, futurY, level)) {
-          y = futurY
-        }
-
-      } else {
-        isMoving = false
-        stateTime = 0f
-      }
+    } else {
+      isMoving  = false
+      stateTime = 0f
+      currentCol = 0  // frame idle
     }
+  }
 
-    private def isHitboxColliding(testPosX: Float, testPosY: Float, level: LevelManager): Boolean = {
-      val boxLeft = testPosX + hitOffsetX
-      val boxRight = boxLeft + hitWidth
-      val boxBottom = testPosY + hitOffsetY
-      val boxTop = boxBottom + hitHeight
+  private def isHitboxColliding(testX: Float, testY: Float): Boolean = {
+    val boxLeft   = testX + hitOffsetX
+    val boxRight  = boxLeft + hitWidth
+    val boxBottom = testY + hitOffsetY
+    val boxTop    = boxBottom + hitHeight
 
-      val botLeftHasWall = level.collisions(boxLeft, boxBottom)
-      val botRightHasWall = level.collisions(boxRight, boxBottom)
-      val topLeftHasWall = level.collisions(boxLeft, boxTop)
-      val topRightHasWall = level.collisions(boxRight, boxTop)
+    level.collisions(boxLeft,  boxBottom) ||
+      level.collisions(boxRight, boxBottom) ||
+      level.collisions(boxLeft,  boxTop)    ||
+      level.collisions(boxRight, boxTop)
+  }
 
-      botLeftHasWall || botRightHasWall || topLeftHasWall || topRightHasWall
-    }
-
-    def render(g: GdxGraphics): Unit = {
-      val currentFrameIdx = if (isMoving) {
-        ((stateTime / frameDuration) % nFrames).toInt
-      }
-      else {
-        0
-      }
-
-      val frameToDraw = FRAMES(currentDirection)(currentFrameIdx)
-
-      g.draw(frameToDraw, x, y)
+  def render(g: GdxGraphics): Unit = {
+    // Vérifie que les indices sont dans les bornes de la spritesheet
+    if (currentRow < FRAMES.length && currentCol < FRAMES(currentRow).length) {
+      val frame = FRAMES(currentRow)(currentCol)
+      g.draw(frame, x, y)
     }
   }
 }

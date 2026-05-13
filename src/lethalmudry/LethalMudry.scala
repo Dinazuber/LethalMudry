@@ -1,61 +1,81 @@
-package lethalmudry {
+package ch.hevs.gdx2d.lethalmudry
 
-  import ch.hevs.gdx2d.components.bitmaps.{BitmapImage, Spritesheet}
-  import ch.hevs.gdx2d.lib.GdxGraphics
-  import ch.hevs.gdx2d.desktop.PortableApplication
-  import com.badlogic.gdx.graphics.OrthographicCamera
+import ch.hevs.gdx2d.lib.GdxGraphics
+import ch.hevs.gdx2d.desktop.PortableApplication
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input.Keys
+import com.badlogic.gdx.graphics.OrthographicCamera
+import lethalmudry.LevelManager
 
-  /**
-   * LethalMudry - Main application
-   *
-   * @version 1.0
-   */
+/**
+ * LethalMudry - Main application
+ *
+ * @version 1.0
+ */
 
-  object LethalMudry {
-    def main(args: Array[String]): Unit = {
-      new LethalMudry
-    }
+object LethalMudry {
+  def main(args: Array[String]): Unit = {
+    new LethalMudry
+  }
+}
+
+class LethalMudry extends PortableApplication(1920, 1080) {
+  val assets: GameAssets         = new GameAssets
+  val levelManager: LevelManager = new LevelManager
+  var player: Player             = _
+  val light: Light = new Light
+
+  override def onInit(): Unit = {
+    setTitle("LethalMudry")
+
+    assets.loadAll()
+    assets.manager.finishLoading()
+
+    // Charger la map
+    val loadedMap = assets.getMap()
+    levelManager.load(loadedMap)
+
+
+    // Créer le player au centre de la map
+    val playerTexture = assets.getPlayerTexture()
+    player = new Player(
+      playerTexture,
+      levelManager.mapPixelWidth / 2,
+      levelManager.mapPixelHeight / 2,
+      levelManager
+    )
+    light.generateLigth()
   }
 
-  class LethalMudry extends PortableApplication(1920, 1080) {
-    private var imgBitmap: BitmapImage = _
-    private val SPRITE_WIDTH = 128
-    private val SPRITE_HEIGHT = 128
-    private var ss: Spritesheet = _
+  override def onGraphicRender(g: GdxGraphics): Unit = {
+    g.clear()
 
-    val light: Light = new Light
-    val mvLogic: MovementLogic = new MovementLogic
-    val assets: GameAssets = new GameAssets
-    val levelManager: LevelManager = new LevelManager
+    // --- Inputs ---
+    var dx = 0f
+    var dy = 0f
+    if (Gdx.input.isKeyPressed(Keys.D)) dx += 1f
+    if (Gdx.input.isKeyPressed(Keys.A)) dx -= 1f
+    if (Gdx.input.isKeyPressed(Keys.W)) dy += 1f
+    if (Gdx.input.isKeyPressed(Keys.S)) dy -= 1f
 
-    override def onInit(): Unit = {
-      setTitle("LethalMudry")
+    // --- Update ---
+    val delta = Gdx.graphics.getDeltaTime
+    player.update(delta, dx, dy)
 
-      imgBitmap = new BitmapImage("data/images/ISC_logo.png")
-      assets.loadAll()
-      assets.manager.finishLoading()
-      val loadedMap = assets.getMap()
-      levelManager.load(loadedMap)
-      ss = new Spritesheet("data/images/lethalCompanyFull.png", SPRITE_WIDTH, SPRITE_HEIGHT)
-      light.generateLigth()
-    }
+    // --- Caméra centrée sur le player ---
+    val camera: OrthographicCamera = g.getCamera
+    camera.position.set(player.x + 64, player.y + 64, 0)
+    g.zoom(0.25f)
+    camera.update()
+    
+    // --- Lumière du jeu ---
+    //TODO A tester
+    light.onClick()
 
-    /**
-     * This method is called periodically by the engine
-     *
-     * @param g
-     */
-    override def onGraphicRender(g: GdxGraphics): Unit = {
-      g.clear()
-      g.drawFPS()
+    // --- Rendu map puis player ---
+    levelManager.render(camera)
+    player.render(g)
 
-      val camera: OrthographicCamera = g.getCamera
-      g.zoom(0.15f)
-      levelManager.render(camera)
-
-      mvLogic.update()
-      light.onClick()
-      g.draw(ss.sprites(mvLogic.line)(mvLogic.col), mvLogic.posX, mvLogic.posY)
-    }
+    g.drawFPS()
   }
 }
