@@ -23,6 +23,7 @@ class LethalMudry extends PortableApplication(1920, 1080) {
   val assets: GameAssets         = new GameAssets
   val levelManager: LevelManager = new LevelManager
   var player: Player             = _
+  val light: Light = new Light
 
   override def onInit(): Unit = {
     setTitle("LethalMudry")
@@ -43,6 +44,7 @@ class LethalMudry extends PortableApplication(1920, 1080) {
       levelManager.mapPixelHeight / 2,
       levelManager
     )
+    light.generateLigth()
   }
 
   override def onGraphicRender(g: GdxGraphics): Unit = {
@@ -65,6 +67,10 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     camera.position.set(player.x + 64, player.y + 64, 0)
     g.zoom(0.25f)
     camera.update()
+    
+    // --- Lumière du jeu ---
+    //TODO A tester
+    light.onClick()
 
     // --- Rendu map puis player ---
     levelManager.render(camera)
