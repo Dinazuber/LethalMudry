@@ -1,0 +1,6 @@
+package lethalmudry {
+
+  class MapCreator {
+    ???
+  }
+}

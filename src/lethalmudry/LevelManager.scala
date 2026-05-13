@@ -1,9 +1,9 @@
-package ch.hevs.gdx2d.hello
-import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.maps.tiled.{TiledMap, TiledMapTileLayer, TmxMapLoader}
-import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
+package lethalmudry {
 
-package  LevelManager{
+  import com.badlogic.gdx.graphics.OrthographicCamera
+  import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
+  import com.badlogic.gdx.maps.tiled.{TiledMap, TiledMapTileLayer}
+
   class LevelManager {
 
     var map: TiledMap = _

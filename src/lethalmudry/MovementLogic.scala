@@ -1,8 +1,8 @@
 import com.badlogic.gdx.Gdx
 
-package MovementLogic {
+package lethalmudry{
 
-  class MovementLogic {
+class MovementLogic {
     private var refTimeSprite = System.currentTimeMillis()
     private val conditionSwapSprite: Int = 250
     private var dt: Float = 0
