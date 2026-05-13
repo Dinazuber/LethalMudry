@@ -23,6 +23,7 @@ package lethalmudry {
     private val SPRITE_HEIGHT = 128
     private var ss: Spritesheet = _
 
+    val light: Light = new Light
     val mvLogic: MovementLogic = new MovementLogic
     val assets: GameAssets = new GameAssets
     val levelManager: LevelManager = new LevelManager
@@ -36,6 +37,7 @@ package lethalmudry {
       val loadedMap = assets.getMap()
       levelManager.load(loadedMap)
       ss = new Spritesheet("data/images/lethalCompanyFull.png", SPRITE_WIDTH, SPRITE_HEIGHT)
+      light.generateLigth()
     }
 
     /**
@@ -52,6 +54,7 @@ package lethalmudry {
       levelManager.render(camera)
 
       mvLogic.update()
+      light.onClick()
       g.draw(ss.sprites(mvLogic.line)(mvLogic.col), mvLogic.posX, mvLogic.posY)
     }
   }
