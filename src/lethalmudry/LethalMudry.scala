@@ -2,7 +2,7 @@ package ch.hevs.gdx2d.lethalmudry
 
 import ch.hevs.gdx2d.lib.GdxGraphics
 import ch.hevs.gdx2d.desktop.PortableApplication
-import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.{Gdx, Input}
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.graphics.OrthographicCamera
 import lethalmudry.LevelManager
@@ -24,7 +24,8 @@ class LethalMudry extends PortableApplication(1920, 1080) {
   val assets: GameAssets         = new GameAssets
   val levelManager: LevelManager = new LevelManager
   var player: Player             = _
-  val light: Light = new Light
+  var light: Light = _
+  var firstRun: Boolean = true
 
   override def onInit(): Unit = {
     setTitle("LethalMudry")
@@ -45,6 +46,7 @@ class LethalMudry extends PortableApplication(1920, 1080) {
       levelManager.mapPixelHeight / 2,
       levelManager
     )
+    light = new Light(player.x, player.y)
     light.generateLigth()
   }
 
@@ -68,14 +70,25 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     camera.position.set(player.x + 64, player.y + 64, 0)
     g.zoom(0.25f)
     camera.update()
-    
-    // --- Lumière du jeu ---
-    //TODO A tester
-    light.onClick()
 
     // --- Rendu map puis player ---
     levelManager.render(camera)
     player.render(g)
+
+    //On vide le "sac" de dessins avant de passer à la lumière
+    g.sbFlush()
+
+    // --- Lumière du jeu ---
+    //Met à jour le ray handler de la lumière
+    light.updateRayHandler(camera)
+
+    //Update la position de la lumière en fonction du joueur
+    light.updatePosition(player.x, player.y)
+
+    //Vérifie si le joueur fait click droit
+    if(Gdx.input.isButtonPressed(Input.Buttons.RIGHT)){
+      light.onClick()
+    }
 
     g.drawFPS()
   }

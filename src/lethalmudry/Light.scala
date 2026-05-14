@@ -15,6 +15,7 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g3d.particles.ParticleSystem
+import com.badlogic.gdx.graphics.g3d.shaders.BaseShader.GlobalSetter
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.World
@@ -22,8 +23,12 @@ import com.badlogic.gdx.physics.box2d.World
 import java.util
 import java.util.Random
 
-
-class Light {
+/**
+ * Créer une lumière qui peut être utiliser par le joueur
+ * @param x position x du joueur
+ * @param y position y du joueur
+ */
+class Light(x: Float, y : Float) {
   var world: World = _
   var rayHandler: RayHandler = _
 
@@ -32,6 +37,9 @@ class Light {
   var width: Int = 0
   var height: Int = 0
 
+  /**
+   * Génère la lumière de base
+   */
   def generateLigth(): Unit = {
     width = Gdx.graphics.getWidth
     height = Gdx.graphics.getHeight
@@ -41,10 +49,8 @@ class Light {
 
     rayHandler = new RayHandler(world)
 
-    c1 = new ConeLight(rayHandler, 300, new Color(1, 1, 1, 0.95f), 14,
-      0.2f * width * PhysicsConstants.PIXEL_TO_METERS,
-      0.9f * height * PhysicsConstants.PIXEL_TO_METERS,
-      270, 40)
+    c1 = new ConeLight(rayHandler, 300, Color.BLUE, 500f,
+      x, y, 270, 40)
 
     rayHandler.setCulling(true)
     rayHandler.setShadows(true)
@@ -52,10 +58,30 @@ class Light {
     rayHandler.setAmbientLight(0.4f)
   }
 
+  /**
+   * Met a jour la position de la lumière
+   * @param x Position x (du joueur)
+   * @param y Position y (du joueur)
+   */
+  def updatePosition(x: Float, y: Float) : Unit = {
+    c1.setPosition(x, y)
+  }
+
+  /**
+   * Met à jour le rayhandler de la lumière
+   * @param camera La caméra utilisé dans le jeu
+   */
+  def updateRayHandler(camera: OrthographicCamera): Unit = {
+    rayHandler.setCombinedMatrix(camera)
+    rayHandler.updateAndRender()
+  }
+
+  /**
+   * Active ou désactive la lumière en fonction d'un click droit
+   */
   def onClick(): Unit = {
-    //Turn off the lights when the player click
-    if(Gdx.input.isKeyPressed(com.badlogic.gdx.Input.Buttons.RIGHT)){
-      c1.setActive(!c1.isActive)
-    }
+    println(s"The player just right clicked!")
+    //Turn off or on the lights when the player click
+    c1.setActive(!c1.isActive)
   }
 }
