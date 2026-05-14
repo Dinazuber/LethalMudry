@@ -64,7 +64,9 @@ class Light(x: Float, y : Float) {
    * @param player le joueur
    */
   def updatePosition(player: Player) : Unit = {
-    c1.setPosition(player.x + (player.getWidth() / 2), player.y + (player.getHeight() / 2))
+    c1.setPosition(player.x + (player.getWidth() / 2), player.y + (player.getHeight() / 3))
+
+    c1.setDirection(player.getHeadDirection())
   }
 
   /**

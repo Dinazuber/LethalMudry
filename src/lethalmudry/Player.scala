@@ -8,6 +8,7 @@ import lethalmudry.LevelManager
 class Player(texture: Texture, startX: Float, startY: Float, level: LevelManager) {
   private val SPRITE_WIDTH  = 85
   private val SPRITE_HEIGHT = 120
+  private var headDirection = 90f //Regarde en haut par défaut
 
   // Découpe la spritesheet en grille de TextureRegion
   private val FRAMES: Array[Array[TextureRegion]] =
@@ -31,12 +32,29 @@ class Player(texture: Texture, startX: Float, startY: Float, level: LevelManager
   val hitOffsetX = 32f
   val hitOffsetY = 0f
 
+  /**
+   *
+   * @return Renvoie la largeur de la sprite
+   */
   def getWidth(): Float = {
     SPRITE_WIDTH
   }
 
+  /**
+   *
+   * @return Renvoie la hauteur de la sprite
+   */
   def getHeight(): Float = {
     SPRITE_HEIGHT
+  }
+
+
+  /**
+   *
+   * @return Renvoie la direction de la tête du joueur
+   */
+  def getHeadDirection(): Float = {
+    headDirection
   }
 
   def update(deltaTime: Float, dx: Float, dy: Float): Unit = {
@@ -46,10 +64,22 @@ class Player(texture: Texture, startX: Float, startY: Float, level: LevelManager
 
       // Choix de la ligne de la spritesheet selon la direction
       // Adapte ces indices selon ta spritesheet lethalCompanyFull.png
-      if      (dy < 0) { currentRow = 3 }  // bas (S)
-      else if (dy > 0) { currentRow = 0 }  // haut (W)
-      else if (dx < 0) { currentRow = 2 }  // gauche (A)
-      else if (dx > 0) { currentRow = 1 }  // droite (D)
+      if      (dy < 0) {
+        currentRow = 3 // bas (S)
+        headDirection = 270f
+      }
+      else if (dy > 0) {
+        currentRow = 0 // haut (W)
+        headDirection = 90f
+      }
+      else if (dx < 0) {
+        currentRow = 2 // gauche (A)
+        headDirection = 180f
+      }
+      else if (dx > 0) {
+        currentRow = 1 // droite (D)
+        headDirection = 0f
+      }
 
       // Alterne entre les frames d'animation
       currentCol = (stateTime / frameDuration).toInt % nFrames
