@@ -31,6 +31,14 @@ class Player(texture: Texture, startX: Float, startY: Float, level: LevelManager
   val hitOffsetX = 32f
   val hitOffsetY = 0f
 
+  def getWidth(): Float = {
+    SPRITE_WIDTH
+  }
+
+  def getHeight(): Float = {
+    SPRITE_HEIGHT
+  }
+
   def update(deltaTime: Float, dx: Float, dy: Float): Unit = {
     if (dx != 0 || dy != 0) {
       isMoving = true

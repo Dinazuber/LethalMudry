@@ -47,7 +47,7 @@ class LethalMudry extends PortableApplication(1920, 1080) {
       levelManager
     )
     light = new Light(player.x, player.y)
-    light.generateLigth()
+    light.generateLight()
   }
 
   override def onGraphicRender(g: GdxGraphics): Unit = {
@@ -83,7 +83,7 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     light.updateRayHandler(camera)
 
     //Update la position de la lumière en fonction du joueur
-    light.updatePosition(player.x, player.y)
+    light.updatePosition(player)
 
     //Vérifie si le joueur fait click droit
     if(Gdx.input.isButtonPressed(Input.Buttons.RIGHT)){

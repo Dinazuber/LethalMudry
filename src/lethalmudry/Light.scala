@@ -8,6 +8,7 @@ import ch.hevs.gdx2d.components.physics.utils.PhysicsConstants
 import ch.hevs.gdx2d.components.physics.utils.PhysicsScreenBoundaries
 import ch.hevs.gdx2d.desktop.PortableApplication
 import ch.hevs.gdx2d.desktop.physics.DebugRenderer
+import ch.hevs.gdx2d.lethalmudry.Player
 import ch.hevs.gdx2d.lib.GdxGraphics
 import ch.hevs.gdx2d.lib.physics.PhysicsWorld
 import com.badlogic.gdx.Gdx
@@ -40,7 +41,7 @@ class Light(x: Float, y : Float) {
   /**
    * Génère la lumière de base
    */
-  def generateLigth(): Unit = {
+  def generateLight(): Unit = {
     width = Gdx.graphics.getWidth
     height = Gdx.graphics.getHeight
 
@@ -49,22 +50,21 @@ class Light(x: Float, y : Float) {
 
     rayHandler = new RayHandler(world)
 
-    c1 = new ConeLight(rayHandler, 300, Color.BLUE, 500f,
+    c1 = new ConeLight(rayHandler, 300, Color.WHITE, 500f,
       x, y, 270, 40)
 
     rayHandler.setCulling(true)
     rayHandler.setShadows(true)
     rayHandler.setBlur(true)
-    rayHandler.setAmbientLight(0.4f)
+    rayHandler.setAmbientLight(0.2f)
   }
 
   /**
-   * Met a jour la position de la lumière
-   * @param x Position x (du joueur)
-   * @param y Position y (du joueur)
+   * Update la position de la lumière en fonctione du jeu
+   * @param player le joueur
    */
-  def updatePosition(x: Float, y: Float) : Unit = {
-    c1.setPosition(x, y)
+  def updatePosition(player: Player) : Unit = {
+    c1.setPosition(player.x + (player.getWidth() / 2), player.y + (player.getHeight() / 2))
   }
 
   /**
