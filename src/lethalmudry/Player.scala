@@ -26,7 +26,9 @@ class Player(texture: Texture, startX: Float, startY: Float, level: LevelManager
   var currentCol: Int    = 0
   var isMoving: Boolean  = false
 
-  private val hp: Int = 150
+  private var hp: Int = 150
+  private var isAlive: Boolean = true
+
 
   val hitWidth   = 64f
   val hitHeight  = 64f
@@ -44,6 +46,19 @@ class Player(texture: Texture, startX: Float, startY: Float, level: LevelManager
   def getHealth(): Int = {
     hp
   }
+
+  def setHealth(newHp: Int): Unit = {
+    hp = newHp
+  }
+
+  def isPlayerAlive(): Boolean = {
+    isAlive
+  }
+
+  def setPlayerAlive(stateAlive: Boolean): Unit = {
+    isAlive = stateAlive
+  }
+
 
   def update(deltaTime: Float, dx: Float, dy: Float): Unit = {
     if (dx != 0 || dy != 0) {

@@ -1,6 +1,7 @@
 package lethalmudry.Ennemies
+import ch.hevs.gdx2d.lethalmudry.Player
 
-trait Ennemies {
+case class Ennemies() {
   var hp: Int = 0
   var speed: Int = 0
   var posX: Int = 0
@@ -8,11 +9,16 @@ trait Ennemies {
   var isAlive: Boolean = true
   var damages: Int = 0
   var visionAngle: Int = 0
-  var playerHp: Int = 0
-  def attack(): Unit = {
-    // Attack the player
-    ???
 
+  def attack(player: Player): Unit = {
+    val playerHp: Int = player.getHealth()
+    // Attack the player
+    if(playerHp >= 0){
+      player.setHealth(playerHp - damages)
+    }
+    else{
+      player.setPlayerAlive(false)
+    }
   }
 
   def move(): Unit = {

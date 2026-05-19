@@ -1,5 +1,7 @@
 package lethalmudry.Ennemies
 
+import ch.hevs.gdx2d.lethalmudry.Player
+
 class Spider extends Ennemies {
   hp = 50
   speed = 125
