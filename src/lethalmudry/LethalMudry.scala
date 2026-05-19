@@ -2,7 +2,7 @@ package ch.hevs.gdx2d.lethalmudry
 
 import ch.hevs.gdx2d.lib.GdxGraphics
 import ch.hevs.gdx2d.desktop.PortableApplication
-import com.badlogic.gdx.{Gdx, Input}
+import com.badlogic.gdx.{Gdx, Input, InputAdapter}
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.graphics.OrthographicCamera
 import lethalmudry.LevelManager
@@ -25,7 +25,7 @@ class LethalMudry extends PortableApplication(1920, 1080) {
   val levelManager: LevelManager = new LevelManager
   var player: Player             = _
   var light: Light = _
-  var firstRun: Boolean = true
+  var lastClickedTime: Long = 0L
 
   override def onInit(): Unit = {
     setTitle("LethalMudry")
@@ -86,8 +86,12 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     light.updatePosition(player)
 
     //Vérifie si le joueur fait click droit
+    val currentTime = System.currentTimeMillis()
     if(Gdx.input.isButtonPressed(Input.Buttons.RIGHT)){
-      light.onClick()
+      if(currentTime - lastClickedTime > 200){
+        light.onClick()
+        lastClickedTime = currentTime
+      }
     }
 
     g.drawFPS()
