@@ -26,6 +26,8 @@ class Player(texture: Texture, startX: Float, startY: Float, level: LevelManager
   var currentCol: Int    = 0
   var isMoving: Boolean  = false
 
+  private val hp: Int = 150
+
   val hitWidth   = 64f
   val hitHeight  = 64f
   val hitOffsetX = 32f
@@ -37,6 +39,10 @@ class Player(texture: Texture, startX: Float, startY: Float, level: LevelManager
 
   def getHeight(): Float = {
     SPRITE_HEIGHT
+  }
+
+  def getHealth(): Int = {
+    hp
   }
 
   def update(deltaTime: Float, dx: Float, dy: Float): Unit = {
