@@ -59,14 +59,12 @@ class Player(texture: Texture, startX: Float, startY: Float, level: LevelManager
     isAlive = stateAlive
   }
 
-
   def update(deltaTime: Float, dx: Float, dy: Float): Unit = {
     if (dx != 0 || dy != 0) {
       isMoving = true
       stateTime += deltaTime
 
       // Choix de la ligne de la spritesheet selon la direction
-      // Adapte ces indices selon ta spritesheet lethalCompanyFull.png
       if      (dy < 0) { currentRow = 3 }  // bas (S)
       else if (dy > 0) { currentRow = 0 }  // haut (W)
       else if (dx < 0) { currentRow = 2 }  // gauche (A)

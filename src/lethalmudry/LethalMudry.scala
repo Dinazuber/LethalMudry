@@ -43,7 +43,7 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     player = new Player(
       playerTexture,
       levelManager.mapPixelWidth / 2,
-      levelManager.mapPixelHeight / 2,
+      levelManager.mapPixelHeight / 6,
       levelManager
     )
     light = new Light(player.x, player.y)
@@ -53,7 +53,7 @@ class LethalMudry extends PortableApplication(1920, 1080) {
   override def onGraphicRender(g: GdxGraphics): Unit = {
     g.clear()
 
-    // --- Inputs ---
+    // Inputs
     var dx = 0f
     var dy = 0f
     if (Gdx.input.isKeyPressed(Keys.D)) dx += 1f
@@ -61,11 +61,11 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     if (Gdx.input.isKeyPressed(Keys.W)) dy += 1f
     if (Gdx.input.isKeyPressed(Keys.S)) dy -= 1f
 
-    // --- Update ---
+    // Update
     val delta = Gdx.graphics.getDeltaTime
     player.update(delta, dx, dy)
 
-    // --- Caméra centrée sur le player ---
+    // Caméra centrée sur le player
     val camera: OrthographicCamera = g.getCamera
     camera.position.set(player.x + 64, player.y + 64, 0)
     g.zoom(0.25f)
@@ -75,7 +75,6 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     levelManager.render(camera)
     player.render(g)
 
-    //On vide le "sac" de dessins avant de passer à la lumière
     g.sbFlush()
 
     // --- Lumière du jeu ---
