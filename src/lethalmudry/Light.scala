@@ -50,7 +50,7 @@ class Light(x: Float, y : Float) {
 
     rayHandler = new RayHandler(world)
 
-    c1 = new ConeLight(rayHandler, 300, Color.WHITE, 500f,
+    c1 = new ConeLight(rayHandler, 300, Color.GRAY, 500f,
       x, y, 270, 40)
 
     rayHandler.setCulling(true)
