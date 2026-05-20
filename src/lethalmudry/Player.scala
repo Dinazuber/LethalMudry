@@ -18,7 +18,7 @@ class Player(texture: Texture, startX: Float, startY: Float, level: LevelManager
   val speed: Float = 150f
 
   var stateTime: Float  = 0f
-  val frameDuration: Float = 0.25f  // en secondes (était en ms avant, corrigé)
+  val frameDuration: Float = 0.25f  // en secondes (était en ms avant)
   val nFrames: Int = 2
 
   // Direction initiale : ligne 0, col 0 (sécurisé)
@@ -45,7 +45,7 @@ class Player(texture: Texture, startX: Float, startY: Float, level: LevelManager
       stateTime += deltaTime
 
       // Choix de la ligne de la spritesheet selon la direction
-      // Adapte ces indices selon ta spritesheet lethalCompanyFull.png
+      // Adapte ces indices selon la spritesheet lethalCompanyFull.png
       if      (dy < 0) { currentRow = 3 }  // bas (S)
       else if (dy > 0) { currentRow = 0 }  // haut (W)
       else if (dx < 0) { currentRow = 2 }  // gauche (A)

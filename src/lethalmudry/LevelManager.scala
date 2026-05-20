@@ -1,8 +1,12 @@
 package lethalmudry {
 
+  import com.badlogic.gdx.Gdx
+  import com.badlogic.gdx.files.FileHandle
   import com.badlogic.gdx.graphics.OrthographicCamera
   import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
   import com.badlogic.gdx.maps.tiled.{TiledMap, TiledMapTileLayer}
+
+  import java.util.logging.FileHandler
 
   class LevelManager {
 
@@ -37,12 +41,20 @@ package lethalmudry {
     def collisions(xPixel: Float, yPixel: Float): Boolean = {
       if (map == null) return false
 
-      val tileX = (xPixel / 32).toInt
-      val tileY = (yPixel / 32).toInt
+      val tileX = (xPixel / 164).toInt
+      val tileY = (yPixel / 164).toInt
 
-      val layer = map.getLayers.get("Walls")
+      val layer = map.getLayers.get("Outside")
+      val layerDoors = map.getLayers.get("Doors")
+
 
       if (layer == null || !layer.isInstanceOf[TiledMapTileLayer]) {
+        return false
+      }
+
+      if (layerDoors == null || !layer.isInstanceOf[TiledMapTileLayer]){
+        val doorAudio : FileHandle = new FileHandle("data/audio/door.mp3")
+        Gdx.audio.newSound(doorAudio)
         return false
       }
 
