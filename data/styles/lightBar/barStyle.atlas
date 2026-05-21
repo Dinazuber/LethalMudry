@@ -1,0 +1,60 @@
+clean-crispy-ui.png
+size: 512,512
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+progressbar-big
+  rotate: false
+  xy: 267, 440
+  size: 31, 31
+  split: 10, 10, 6, 9
+  pad: 1, 1, 0, 0
+  orig: 31, 31
+  offset: 0, 0
+  index: -1
+progressbar-horizontal
+  rotate: false
+  xy: 267, 426
+  size: 23, 12
+  split: 5, 5, 3, 3
+  pad: 3, 3, 0, 0
+  orig: 23, 12
+  offset: 0, 0
+  index: -1
+progressbar-knob-big
+  rotate: false
+  xy: 64, 145
+  size: 24, 26
+  orig: 24, 26
+  offset: 0, 0
+  index: -1
+progressbar-knob-horizontal
+  rotate: false
+  xy: 135, 323
+  size: 1, 12
+  orig: 1, 12
+  offset: 0, 0
+  index: -1
+progressbar-knob-vertical
+  rotate: false
+  xy: 101, 396
+  size: 12, 1
+  orig: 12, 1
+  offset: 0, 0
+  index: -1
+progressbar-tiled
+  rotate: false
+  xy: 135, 337
+  size: 15, 12
+  orig: 15, 12
+  offset: 0, 0
+  index: -1
+progressbar-vertical
+  rotate: false
+  xy: 499, 448
+  size: 12, 23
+  split: 0, 12, 5, 6
+  pad: 0, 0, 3, 3
+  orig: 12, 23
+  offset: 0, 0
+  index: -1
