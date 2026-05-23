@@ -2,12 +2,11 @@ package ch.hevs.gdx2d.lethalmudry
 
 import ch.hevs.gdx2d.lib.GdxGraphics
 import ch.hevs.gdx2d.desktop.PortableApplication
-import com.badlogic.gdx.{Gdx, Input, InputAdapter}
+import com.badlogic.gdx.{Gdx, Input}
 import com.badlogic.gdx.Input.Keys
-import com.badlogic.gdx.graphics.g2d.{TextureAtlas, TextureRegion}
-import com.badlogic.gdx.graphics.{Color, OrthographicCamera}
+import com.badlogic.gdx.graphics.g2d.TextureAtlas
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.scenes.scene2d.Stage
-import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar.ProgressBarStyle
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar
 import com.badlogic.gdx.utils.viewport.ScreenViewport
@@ -31,6 +30,11 @@ class LethalMudry extends PortableApplication(1920, 1080) {
   var player: Player             = _
   var light: Light = _
   var lastClickedTime: Long = 0L
+
+  //Style Health Bar
+  var healthAtlas: TextureAtlas = _
+  var healthSkin: Skin = _
+  var healthBar: ProgressBar = _
 
   //Style light
   var atlas: TextureAtlas = _
@@ -70,17 +74,31 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     lightBar = new ProgressBar(0f, 1f, 0.01f, false, skin)
 
     //Met a jour la bar de recharge de la lumière
-    lightBar.setPosition(player.x, player.y)
-    lightBar.setSize(290f, 200f)
-    lightBar.setAnimateDuration(2)
+    lightBar.setPosition(20f, 50f)
+    lightBar.setSize(500f, 50f)
+    lightBar.setAnimateDuration(0.2f)
     lightBar.setValue(1f) //La batterie de la lumière est pleine
 
     //Start one second counter (to decrease light battery
     counterManager.startCounter()
 
+    //Créer la barre de vie du personnage
+    healthAtlas = new TextureAtlas(Gdx.files.internal("data/styles/healthBar/healthBar.atlas"))
+    healthSkin = new Skin(Gdx.files.internal("data/styles/healthBar/healthBar.json"), healthAtlas)
+
+    healthBar = new ProgressBar(0f, 100f, 1f, false, healthSkin, "health")
+    healthBar.setSize(500f, 100f)
+    healthBar.setAnimateDuration(2f)
+    healthBar.setValue(100f)
+
+    //Ajouter les positions des bars
+    lightBar.setPosition(20f, Gdx.graphics.getHeight - 180f)
+    healthBar.setPosition(20f, Gdx.graphics.getHeight - 130f)
+
     //Init the stage and config it
-    stage = new Stage()
+    stage = new Stage(new ScreenViewport())
     stage.addActor(lightBar)
+    stage.addActor(healthBar)
   }
 
   override def onGraphicRender(g: GdxGraphics): Unit = {
@@ -155,11 +173,8 @@ class LethalMudry extends PortableApplication(1920, 1080) {
       counterManager.resetStartValue()
     }
 
-    //Update the camera of the stage
-    stage.getViewport.setCamera(g.getCamera)
-
-    //Update the progress bar position
-    lightBar.setPosition(player.x - 170f, player.y - 160f)
+    //Met a jour les éléments graphiques du jeu (progressbar)
+    stage.getViewport.update(Gdx.graphics.getWidth, Gdx.graphics.getHeight, true)
     stage.act(delta)
     stage.draw()
 
