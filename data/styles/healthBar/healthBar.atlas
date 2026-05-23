@@ -1,0 +1,51 @@
+healthBar.png
+size: 1024,1024
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+progress-bar-health
+  rotate: false
+  xy: 1, 311
+  size: 498, 90
+  split: 138, 69, 0, 0
+  pad: 117, 45, 18, 18
+  orig: 498, 90
+  offset: 0, 0
+  index: -1
+progress-bar-health-knob
+  rotate: false
+  xy: 622, 969
+  size: 336, 54
+  orig: 336, 54
+  offset: 0, 0
+  index: -1
+progress-bar-horizontal
+  rotate: false
+  xy: 1013, 726
+  size: 9, 45
+  split: 3, 3, 3, 3
+  orig: 9, 45
+  offset: 0, 0
+  index: -1
+progress-bar-horizontal-knob
+  rotate: false
+  xy: 840, 459
+  size: 1, 39
+  orig: 1, 39
+  offset: 0, 0
+  index: -1
+progress-bar-vertical
+  rotate: false
+  xy: 501, 219
+  size: 45, 9
+  split: 3, 3, 3, 3
+  orig: 45, 9
+  offset: 0, 0
+  index: -1
+progress-bar-vertical-knob
+  rotate: false
+  xy: 778, 194
+  size: 39, 1
+  orig: 39, 1
+  offset: 0, 0
+  index: -1
