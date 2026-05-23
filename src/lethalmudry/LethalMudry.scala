@@ -88,7 +88,7 @@ class LethalMudry extends PortableApplication(1920, 1080) {
 
     healthBar = new ProgressBar(0f, 100f, 1f, false, healthSkin, "health")
     healthBar.setSize(500f, 100f)
-    healthBar.setAnimateDuration(2f)
+    healthBar.setAnimateDuration(0.2f)
     healthBar.setValue(100f)
 
     //Ajouter les positions des bars
@@ -154,6 +154,16 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     //Test to recharge batterie
     if(Gdx.input.isKeyPressed(Input.Keys.C)){
       lightBar.setValue(1f)
+    }
+
+    //Test to deal damage
+    if(Gdx.input.isKeyJustPressed(Input.Keys.K)){
+      healthBar.setValue(healthBar.getValue - 10f)
+    }
+
+    //Heal player
+    if(Gdx.input.isKeyJustPressed(Input.Keys.H)){
+      healthBar.setValue(healthBar.getValue + 10f)
     }
 
     //Si la lumière est active et depuis plus d'une seconde, baisse sa vie
