@@ -6,11 +6,15 @@ import com.badlogic.gdx.{Gdx, Input}
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar
 import com.badlogic.gdx.utils.viewport.ScreenViewport
 import lethalmudry.{Counter, LevelManager, Light}
+import objects.{Battery, Heal}
+
+import scala.collection.mutable.ArrayBuffer
 
 /**
  * LethalMudry - Main application
@@ -28,6 +32,7 @@ class LethalMudry extends PortableApplication(1920, 1080) {
   val assets: GameAssets         = new GameAssets
   val levelManager: LevelManager = new LevelManager
   var player: Player             = _
+  var playerHitBox: Rectangle = _
   var light: Light = _
   var lastClickedTime: Long = 0L
 
@@ -45,6 +50,11 @@ class LethalMudry extends PortableApplication(1920, 1080) {
 
   //Stage to add elements on the window
   var stage: Stage = _
+
+  //Game objects
+  var objectsList: ArrayBuffer[Object] = _
+  var battery: Battery = _
+  var heal: Heal = _
 
   override def onInit(): Unit = {
     setTitle("LethalMudry")
@@ -65,8 +75,17 @@ class LethalMudry extends PortableApplication(1920, 1080) {
       levelManager.mapPixelHeight / 2,
       levelManager
     )
+    playerHitBox = new Rectangle(player.x, player.y, 64f, 64f)
+
     light = new Light(player.x, player.y)
     light.generateLight()
+
+    //Ajouter des objets randoms
+    val batteryTexture = assets.getBatteryTexture()
+    val healTexture = assets.getHealTexture()
+
+    battery = new Battery(player.x, player.y, batteryTexture, 32f, 45f)
+    heal = new Heal(player.x + 40f, player.y, healTexture, 32, 45f)
 
     //Créer la barre de recharge de la lumière et ajouter les styles
     atlas = new TextureAtlas(Gdx.files.internal("data/styles/lightBar/barStyle.atlas"))
@@ -125,6 +144,9 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     // --- Rendu map puis player ---
     levelManager.render(camera)
     player.render(g)
+
+    battery.render(g)
+    heal.render(g)
 
     //On vide le "sac" de dessins avant de passer à la lumière
     g.sbFlush()

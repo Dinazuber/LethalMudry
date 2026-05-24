@@ -11,11 +11,15 @@ class GameAssets extends Disposable {
 
   private val MAP_PATH    = "data/images/TilesBigger/maps.tmx"
   private val PLAYER_PATH = "data/images/sprite_sheet.png"
+  private val BATTERY_PATH = "data/images/battery.png"
+  private val HEAL_PATH = "data/images/heal.png"
 
   def loadAll(): Unit = {
     manager.setLoader(classOf[TiledMap], new TmxMapLoader(new InternalFileHandleResolver))
     manager.load(MAP_PATH, classOf[TiledMap])
     manager.load(PLAYER_PATH, classOf[Texture])
+    manager.load(BATTERY_PATH, classOf[Texture])
+    manager.load(HEAL_PATH, classOf[Texture])
   }
 
   def updateLoading(): Boolean = {
@@ -28,6 +32,14 @@ class GameAssets extends Disposable {
 
   def getMap(): TiledMap = {
     manager.get(MAP_PATH, classOf[TiledMap])
+  }
+
+  def getBatteryTexture() : Texture = {
+    manager.get(BATTERY_PATH, classOf[Texture])
+  }
+
+  def getHealTexture(): Texture = {
+    manager.get(HEAL_PATH, classOf[Texture])
   }
 
   override def dispose(): Unit = {
