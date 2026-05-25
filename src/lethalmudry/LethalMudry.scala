@@ -11,7 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar
 import com.badlogic.gdx.utils.viewport.ScreenViewport
-import lethalmudry.{Counter, LevelManager, Light}
+import lethalmudry.{Counter, LevelManager, Light, PopUp}
 import objects.{Battery, Heal}
 
 import scala.collection.mutable.ArrayBuffer
@@ -51,8 +51,10 @@ class LethalMudry extends PortableApplication(1920, 1080) {
   //Stage to add elements on the window
   var stage: Stage = _
 
+  //Notification pour le joueur
+
   //Game objects
-  var objectsList: ArrayBuffer[Object] = _
+  var objectsList: ArrayBuffer[objects.Object] = new ArrayBuffer[objects.Object]() //Needed to specify the package
   var battery: Battery = _
   var heal: Heal = _
 
@@ -84,8 +86,10 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     val batteryTexture = assets.getBatteryTexture()
     val healTexture = assets.getHealTexture()
 
-    battery = new Battery(player.x, player.y, batteryTexture, 32f, 45f)
-    heal = new Heal(player.x + 40f, player.y, healTexture, 32, 45f)
+    battery = new Battery(player.x + 50f, player.y + 50f, batteryTexture, 32f, 45f)
+    heal = new Heal(player.x + 270f, player.y + 234f, healTexture, 32, 45f)
+    objectsList.append(battery)
+    objectsList.append(heal)
 
     //Créer la barre de recharge de la lumière et ajouter les styles
     atlas = new TextureAtlas(Gdx.files.internal("data/styles/lightBar/barStyle.atlas"))
@@ -134,6 +138,8 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     // --- Update ---
     val delta = Gdx.graphics.getDeltaTime
     player.update(delta, dx, dy)
+    playerHitBox.setX(player.x)
+    playerHitBox.setY(player.y)
 
     // --- Caméra centrée sur le player ---
     val camera: OrthographicCamera = g.getCamera
@@ -145,11 +151,22 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     levelManager.render(camera)
     player.render(g)
 
-    battery.render(g)
-    heal.render(g)
+    for(o <- objectsList){
+      o.render(g)
+    }
 
     //On vide le "sac" de dessins avant de passer à la lumière
     g.sbFlush()
+    objectsList.filterInPlace({o =>
+      if(playerHitBox.overlaps(o.hitbox)) {
+        o.collect(player, this)
+        var notif = new PopUp(s"Vous avez ramasser un/e ${o.getClass.getSimpleName}", stage)
+
+        false
+      } else {
+        true
+      }
+    })
 
     // --- Lumière du jeu ---
     //Met à jour le ray handler de la lumière

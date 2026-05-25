@@ -11,7 +11,7 @@ abstract class Object(posX: Float,
                       height: Float,
                       texture: Texture) {
 
-  val hitbox: Rectangle = new Rectangle(posX, posY, texture.getWidth, texture.getHeight)
+  val hitbox: Rectangle = new Rectangle(posX, posY, width, height)
 
 
   def collect(player: Player, game: LethalMudry): Unit = {
