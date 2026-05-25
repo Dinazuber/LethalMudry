@@ -1,5 +1,6 @@
 package ch.hevs.gdx2d.lethalmudry
 
+import ch.hevs.gdx2d.components.audio.MusicPlayer
 import ch.hevs.gdx2d.lib.GdxGraphics
 import ch.hevs.gdx2d.desktop.PortableApplication
 import com.badlogic.gdx.{Gdx, Input}
@@ -45,6 +46,9 @@ class LethalMudry extends PortableApplication(1920, 1080) {
 
   //Stage to add elements on the window
   var stage: Stage = _
+
+  //Music player
+  var music: MusicPlayer = _
 
   override def onInit(): Unit = {
     setTitle("LethalMudry")
@@ -99,6 +103,10 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     stage = new Stage(new ScreenViewport())
     stage.addActor(lightBar)
     stage.addActor(healthBar)
+
+    //Init the music player
+    music = new MusicPlayer("data/music/lethalOST.mp3")
+    music.play()
   }
 
   override def onGraphicRender(g: GdxGraphics): Unit = {
