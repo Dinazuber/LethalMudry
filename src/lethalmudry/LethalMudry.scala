@@ -86,7 +86,7 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     val batteryTexture = assets.getBatteryTexture()
     val healTexture = assets.getHealTexture()
 
-    battery = new Battery(player.x + 50f, player.y + 50f, batteryTexture, 32f, 45f)
+    battery = new Battery(player.x + 250f, player.y + 50f, batteryTexture, 32f, 45f)
     heal = new Heal(player.x + 270f, player.y + 234f, healTexture, 32, 45f)
     objectsList.append(battery)
     objectsList.append(heal)
