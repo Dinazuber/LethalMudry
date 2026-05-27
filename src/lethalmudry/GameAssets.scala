@@ -9,7 +9,7 @@ package ch.hevs.gdx2d.lethalmudry {
   class GameAssets extends Disposable {
     val manager: AssetManager = new AssetManager()
 
-    private val MAP_PATH = "data/images/TilesBigger/maps.tmx"
+    private val MAP_PATH = "data/images/TilesBigger/map.tmx"
     private val PLAYER_PATH = "data/images/sprite_sheet.png"
 
     def loadAll(): Unit = {

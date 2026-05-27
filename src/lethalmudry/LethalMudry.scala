@@ -11,7 +11,7 @@ import lethalmudry.Light
 /**
  * LethalMudry - Main application
  *
- * @version 1.0
+ * @version 1.0sa
  */
 
 object LethalMudry {
@@ -25,7 +25,6 @@ class LethalMudry extends PortableApplication(1920, 1080) {
   val levelManager: LevelManager = new LevelManager
   var player: Player             = _
   var light: Light = _
-  var firstRun: Boolean = true
 
   override def onInit(): Unit = {
     setTitle("LethalMudry")
@@ -37,13 +36,12 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     val loadedMap = assets.getMap()
     levelManager.load(loadedMap)
 
-
     // Créer le player au centre de la map
     val playerTexture = assets.getPlayerTexture()
     player = new Player(
       playerTexture,
       levelManager.mapPixelWidth / 2,
-      levelManager.mapPixelHeight / 2,
+      levelManager.mapPixelHeight / 10,
       levelManager
     )
     light = new Light(player.x, player.y)
