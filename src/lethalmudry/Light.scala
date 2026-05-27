@@ -35,6 +35,8 @@ class Light(x: Float, y : Float) {
 
   var c1 : ConeLight = _
 
+  var isAvailable: Boolean = true
+
   var width: Int = 0
   var height: Int = 0
 
@@ -50,7 +52,7 @@ class Light(x: Float, y : Float) {
 
     rayHandler = new RayHandler(world)
 
-    c1 = new ConeLight(rayHandler, 300, Color.WHITE, 500f,
+    c1 = new ConeLight(rayHandler, 300, Color.GRAY, 500f,
       x, y, 270, 40)
 
     rayHandler.setCulling(true)
@@ -64,7 +66,9 @@ class Light(x: Float, y : Float) {
    * @param player le joueur
    */
   def updatePosition(player: Player) : Unit = {
-    c1.setPosition(player.x + (player.getWidth() / 2), player.y + (player.getHeight() / 2))
+    c1.setPosition(player.x + (player.getWidth() / 2), player.y + (player.getHeight() / 3))
+
+    c1.setDirection(player.getHeadDirection())
   }
 
   /**
@@ -83,5 +87,28 @@ class Light(x: Float, y : Float) {
     println(s"The player just right clicked!")
     //Turn off or on the lights when the player click
     c1.setActive(!c1.isActive)
+  }
+
+  /**
+   * Désactive la lumière
+   */
+  def disableLight(): Unit = {
+    c1.setActive(false)
+    isAvailable = false
+  }
+
+  /**
+   * Active la lumière
+   */
+  def avaibleLight(): Unit = {
+    isAvailable = true
+  }
+
+  /**
+   * L'état de la lumière pour le joueur
+   * @return Retourne "true" si la lumière est active, sinon "false"
+   */
+  def lightStatus(): Boolean = {
+    c1.isActive
   }
 }
