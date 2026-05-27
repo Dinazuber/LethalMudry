@@ -51,7 +51,10 @@ class LethalMudry extends PortableApplication(1920, 1080) {
   //Stage to add elements on the window
   var stage: Stage = _
 
-  //Notification pour le joueur
+  //Barre d'inventaire
+  var inventoryAtlas: TextureAtlas = _
+  var inventorySkin : Skin = _
+  var inventoryBar : ProgressBar = _
 
   //Game objects
   var objectsList: ArrayBuffer[objects.Object] = new ArrayBuffer[objects.Object]() //Needed to specify the package
@@ -86,6 +89,16 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     val batteryTexture = assets.getBatteryTexture()
     val healTexture = assets.getHealTexture()
 
+    //Generate 15 items in the map
+    /*for(i <- 0 to 14){
+      var rdm: Int = (math.random() * 10).toInt
+      rdm match(
+        case rdm > 60 => objectsList.append(new )
+
+        case _ =>
+      )
+    }*/
+
     battery = new Battery(player.x + 250f, player.y + 50f, batteryTexture, 32f, 45f)
     heal = new Heal(player.x + 270f, player.y + 234f, healTexture, 32, 45f)
     objectsList.append(battery)
@@ -114,14 +127,24 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     healthBar.setAnimateDuration(0.2f)
     healthBar.setValue(100f)
 
+    //Créer la barre d'inventaire du personnage
+    inventoryAtlas = new TextureAtlas(Gdx.files.internal("data/styles/inventory/inventoryBar.atlas"))
+    inventorySkin = new Skin(Gdx.files.internal("data/styles/inventory/inventoryBar.json"), inventoryAtlas)
+
+    inventoryBar = new ProgressBar(0f, 100f, 1f, false, inventorySkin, "mana")
+    inventoryBar.setSize(500f, 30f)
+    inventoryBar.setAnimateDuration(0.2f)
+
     //Ajouter les positions des bars
     lightBar.setPosition(20f, Gdx.graphics.getHeight - 180f)
     healthBar.setPosition(20f, Gdx.graphics.getHeight - 130f)
+    inventoryBar.setPosition((Gdx.graphics.getWidth - inventoryBar.getWidth) /2, 20f)
 
     //Init the stage and config it
     stage = new Stage(new ScreenViewport())
     stage.addActor(lightBar)
     stage.addActor(healthBar)
+    stage.addActor(inventoryBar)
   }
 
   override def onGraphicRender(g: GdxGraphics): Unit = {
