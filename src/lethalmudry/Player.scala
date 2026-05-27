@@ -10,7 +10,6 @@ class Player(texture: Texture, startX: Float, startY: Float, level: LevelManager
   private val SPRITE_HEIGHT = 120
   private var headDirection = 90f //Regarde en haut par défaut
 
-  // Découpe la spritesheet en grille de TextureRegion
   private val FRAMES: Array[Array[TextureRegion]] =
     TextureRegion.split(texture, SPRITE_WIDTH, SPRITE_HEIGHT)
 
@@ -18,35 +17,21 @@ class Player(texture: Texture, startX: Float, startY: Float, level: LevelManager
   var y: Float = startY
   val speed: Float = 150f
 
-  var stateTime: Float  = 0f
-  val frameDuration: Float = 0.25f  // en secondes (était en ms avant, corrigé)
-  val nFrames: Int = 2
+  var stateTime: Float     = 0f
+  val frameDuration: Float = 0.25f
+  val nFrames: Int         = 2
 
-  // Direction initiale : ligne 0, col 0 (sécurisé)
   var currentRow: Int    = 0
   var currentCol: Int    = 0
   var isMoving: Boolean  = false
 
-  val hitWidth   = 64f
-  val hitHeight  = 64f
+  val hitWidth   = 32f
+  val hitHeight  = 32f
   val hitOffsetX = 32f
   val hitOffsetY = 0f
 
-  /**
-   *
-   * @return Renvoie la largeur de la sprite
-   */
-  def getWidth(): Float = {
-    SPRITE_WIDTH
-  }
-
-  /**
-   *
-   * @return Renvoie la hauteur de la sprite
-   */
-  def getHeight(): Float = {
-    SPRITE_HEIGHT
-  }
+  def getWidth():  Float = SPRITE_WIDTH
+  def getHeight(): Float = SPRITE_HEIGHT
 
 
   /**
@@ -59,7 +44,7 @@ class Player(texture: Texture, startX: Float, startY: Float, level: LevelManager
 
   def update(deltaTime: Float, dx: Float, dy: Float): Unit = {
     if (dx != 0 || dy != 0) {
-      isMoving = true
+      isMoving  = true
       stateTime += deltaTime
 
       // Choix de la ligne de la spritesheet selon la direction
@@ -81,10 +66,8 @@ class Player(texture: Texture, startX: Float, startY: Float, level: LevelManager
         headDirection = 0f
       }
 
-      // Alterne entre les frames d'animation
       currentCol = (stateTime / frameDuration).toInt % nFrames
 
-      // Calcul du mouvement avec collisions axe par axe
       val futurX = x + dx * speed * deltaTime
       val futurY = y + dy * speed * deltaTime
 
@@ -92,15 +75,18 @@ class Player(texture: Texture, startX: Float, startY: Float, level: LevelManager
       if (!isHitboxColliding(x, futurY)) { y = futurY }
 
     } else {
-      isMoving  = false
-      stateTime = 0f
-      currentCol = 0  // frame idle
+      isMoving   = false
+      stateTime  = 0f
+      currentCol = 0
     }
   }
 
+  def getPosX(posX: Float): Float = { x = posX; x }
+  def getPosY(posY: Float): Float  = { y = posY; y }
+
   private def isHitboxColliding(testX: Float, testY: Float): Boolean = {
     val boxLeft   = testX + hitOffsetX
-    val boxRight  = boxLeft + hitWidth
+    val boxRight  = boxLeft  + hitWidth
     val boxBottom = testY + hitOffsetY
     val boxTop    = boxBottom + hitHeight
 
@@ -111,7 +97,6 @@ class Player(texture: Texture, startX: Float, startY: Float, level: LevelManager
   }
 
   def render(g: GdxGraphics): Unit = {
-    // Vérifie que les indices sont dans les bornes de la spritesheet
     if (currentRow < FRAMES.length && currentCol < FRAMES(currentRow).length) {
       val frame = FRAMES(currentRow)(currentCol)
       g.draw(frame, x, y)
