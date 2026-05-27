@@ -9,7 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.{Label, Skin}
 import java.awt.Desktop.Action
 
 class PopUp(text: String, stage: Stage) {
-  val skinText: Skin = new Skin(Gdx.files.internal("data/styles/healthBar/textFont.json"))
+  val skinText: Skin = new Skin(Gdx.files.internal("data/styles/label/textFont.json"))
   val label: Label = new Label(text, skinText)
 
   label.setPosition(Gdx.graphics.getWidth / 2f - label.getWidth /2f, Gdx.graphics.getHeight * 0.7f)
