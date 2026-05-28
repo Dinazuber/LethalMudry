@@ -13,6 +13,7 @@ class GameAssets extends Disposable {
   private val PLAYER_PATH = "data/images/sprite_sheet.png"
   private val BATTERY_PATH = "data/images/battery.png"
   private val HEAL_PATH = "data/images/heal.png"
+  private val BOLT_PATH = "data/images/scrap/big_bolt.png"
 
   def loadAll(): Unit = {
     manager.setLoader(classOf[TiledMap], new TmxMapLoader(new InternalFileHandleResolver))
@@ -20,6 +21,7 @@ class GameAssets extends Disposable {
     manager.load(PLAYER_PATH, classOf[Texture])
     manager.load(BATTERY_PATH, classOf[Texture])
     manager.load(HEAL_PATH, classOf[Texture])
+    manager.load(BOLT_PATH, classOf[Texture])
   }
 
   def updateLoading(): Boolean = {
@@ -40,6 +42,10 @@ class GameAssets extends Disposable {
 
   def getHealTexture(): Texture = {
     manager.get(HEAL_PATH, classOf[Texture])
+  }
+
+  def getBoltTexture(): Texture = {
+    manager.get(BOLT_PATH, classOf[Texture])
   }
 
   override def dispose(): Unit = {
