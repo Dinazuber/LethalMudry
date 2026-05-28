@@ -42,6 +42,22 @@ class Player(texture: Texture, startX: Float, startY: Float, level: LevelManager
     headDirection
   }
 
+  def getHealth(): Int = {
+    hp
+  }
+
+  def setHealth(newHp: Int): Unit = {
+    hp = newHp
+  }
+
+  def isPlayerAlive(): Boolean = {
+    isAlive
+  }
+
+  def setPlayerAlive(stateAlive: Boolean): Unit = {
+    isAlive = stateAlive
+  }
+
   def update(deltaTime: Float, dx: Float, dy: Float): Unit = {
     if (dx != 0 || dy != 0) {
       isMoving  = true
