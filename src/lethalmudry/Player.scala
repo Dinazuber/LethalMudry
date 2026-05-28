@@ -24,6 +24,8 @@ class Player(texture: Texture, startX: Float, startY: Float, level: LevelManager
   var currentRow: Int    = 0
   var currentCol: Int    = 0
   var isMoving: Boolean  = false
+  private var hp: Int = 150
+  private var isAlive: Boolean = true
 
   val hitWidth   = 32f
   val hitHeight  = 32f

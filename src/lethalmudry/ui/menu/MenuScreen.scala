@@ -11,7 +11,7 @@ class MenuScreen extends RenderingScreen {
   protected var imgBackground: BitmapImage = _
 
   override def onInit(): Unit = {
-    imgBackground = new BitmapImage("images/backgroundMenu.png")
+    imgBackground = new BitmapImage("data/images/backgroundMenu.png")
   }
 
   override def onGraphicRender(g: GdxGraphics): Unit = {
