@@ -12,7 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar
 import com.badlogic.gdx.utils.viewport.ScreenViewport
 import lethalmudry.{Counter, LevelManager, Light, PopUp}
-import objects.{Battery, Heal}
+import objects.{Battery, Heal, Bolt}
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -60,6 +60,7 @@ class LethalMudry extends PortableApplication(1920, 1080) {
   var objectsList: ArrayBuffer[objects.Object] = new ArrayBuffer[objects.Object]() //Needed to specify the package
   var battery: Battery = _
   var heal: Heal = _
+  var bolt: Bolt = _
 
   override def onInit(): Unit = {
     setTitle("LethalMudry")
@@ -88,6 +89,7 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     //Ajouter des objets randoms
     val batteryTexture = assets.getBatteryTexture()
     val healTexture = assets.getHealTexture()
+    val boltTexture = assets.getBoltTexture()
 
     //Generate 15 items in the map
     /*for(i <- 0 to 14){
@@ -101,8 +103,10 @@ class LethalMudry extends PortableApplication(1920, 1080) {
 
     battery = new Battery(player.x + 250f, player.y + 50f, batteryTexture, 32f, 45f)
     heal = new Heal(player.x + 270f, player.y + 234f, healTexture, 32, 45f)
+    bolt = new Bolt(player.x + 570f, player.y + 234f, boltTexture, 32, 45f)
     objectsList.append(battery)
     objectsList.append(heal)
+    objectsList.append(bolt)
 
     //Créer la barre de recharge de la lumière et ajouter les styles
     atlas = new TextureAtlas(Gdx.files.internal("data/styles/lightBar/barStyle.atlas"))
@@ -126,6 +130,7 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     healthBar.setSize(500f, 100f)
     healthBar.setAnimateDuration(0.2f)
     healthBar.setValue(100f)
+    healthBar.getStyle.knobBefore.setMinWidth(0f)
 
     //Créer la barre d'inventaire du personnage
     inventoryAtlas = new TextureAtlas(Gdx.files.internal("data/styles/inventory/inventoryBar.atlas"))
@@ -134,6 +139,8 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     inventoryBar = new ProgressBar(0f, 100f, 1f, false, inventorySkin, "mana")
     inventoryBar.setSize(500f, 30f)
     inventoryBar.setAnimateDuration(0.2f)
+    inventoryBar.setValue(0f)
+    inventoryBar.getStyle.knobBefore.setMinWidth(0f)
 
     //Ajouter les positions des bars
     lightBar.setPosition(20f, Gdx.graphics.getHeight - 180f)
