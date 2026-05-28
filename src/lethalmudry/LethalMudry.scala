@@ -12,7 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar
 import com.badlogic.gdx.utils.viewport.ScreenViewport
 import lethalmudry.{Counter, LevelManager, Light, PopUp}
-import objects.{Battery, Heal, Bolt}
+import objects.{Battery, Bolt, Heal, Water}
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -90,16 +90,39 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     val batteryTexture = assets.getBatteryTexture()
     val healTexture = assets.getHealTexture()
     val boltTexture = assets.getBoltTexture()
+    val waterTexture = assets.getWaterTexture()
 
     //Generate 15 items in the map
-    /*for(i <- 0 to 14){
-      var rdm: Int = (math.random() * 10).toInt
-      rdm match(
-        case rdm > 60 => objectsList.append(new )
+    for(i <- 0 to 14){
+      var chances: Int = (math.random() * 100).toInt
 
-        case _ =>
-      )
-    }*/
+      var posX = (math.random() * 1000).toInt
+      var posY = (math.random() * 1000).toInt
+
+      while(posY > 6500){
+        posY = (math.random() * 1000).toInt
+      }
+
+      while(posX > 3200){
+        posX= (math.random() * 1000).toInt
+      }
+
+      if(chances <= 60){
+        var fithy = (math.random()*100).toInt
+        println(fithy)
+        if(fithy >= 50){
+          objectsList.append(new Bolt(posX, posY, boltTexture, 32, 45f))
+        }else {
+          objectsList.append(new Water(posX, posY, waterTexture, 32, 45f))
+        }
+      } else if(chances <= 80){
+        objectsList.append(new Heal(posX, posY, healTexture, 32, 45f))
+      } else {
+        objectsList.append(new Battery(posX, posY, batteryTexture, 32, 45f))
+      }
+
+      println(s"the object is at ${posX}/${posY}")
+    }
 
     battery = new Battery(player.x + 250f, player.y + 50f, batteryTexture, 32f, 45f)
     heal = new Heal(player.x + 270f, player.y + 234f, healTexture, 32, 45f)
@@ -170,6 +193,7 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     player.update(delta, dx, dy)
     playerHitBox.setX(player.x)
     playerHitBox.setY(player.y)
+    println(s"the player is at : ${player.x}/${player.y}")
 
     // --- Caméra centrée sur le player ---
     val camera: OrthographicCamera = g.getCamera
