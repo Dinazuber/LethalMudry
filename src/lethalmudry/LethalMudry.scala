@@ -55,7 +55,7 @@ class LethalMudry extends PortableApplication(1920, 1080) {
   override def onGraphicRender(g: GdxGraphics): Unit = {
     if(menuOn){
       menu.onGraphicRender(g)
-      if(Gdx.input.isButtonPressed(Input.Buttons.LEFT)){
+      if(Gdx.input.isKeyPressed(Input.Keys.ENTER)){
         menuOn = false
       }
       else{

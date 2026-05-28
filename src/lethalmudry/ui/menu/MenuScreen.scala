@@ -1,18 +1,26 @@
 package lethalmudry.ui.menu
 
+import ch.hevs.gdx2d.components.bitmaps.BitmapImage
 import ch.hevs.gdx2d.components.screen_management.RenderingScreen
 import ch.hevs.gdx2d.lib.GdxGraphics
 import ch.hevs.gdx2d.lib.physics.PhysicsWorld
-import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.{Color}
 
 class MenuScreen extends RenderingScreen {
-  override def onInit(): Unit = {}
+
+  protected var imgBackground: BitmapImage = _
+
+  override def onInit(): Unit = {
+    imgBackground = new BitmapImage("images/backgroundMenu.png")
+  }
 
   override def onGraphicRender(g: GdxGraphics): Unit = {
-    g.clear(Color.DARK_GRAY)
+    onInit()
+    g.clear(Color.BLACK)
+    g.drawPicture((g.getScreenWidth / 4).toFloat, (g.getScreenHeight / 2).toFloat, imgBackground)
+    g.drawPicture((g.getScreenWidth / 1.2).toFloat, (g.getScreenHeight / 2).toFloat, imgBackground)
     g.drawStringCentered((g.getScreenHeight / 2).toFloat, "Welcome to LethalMudry")
-    g.drawStringCentered((g.getScreenHeight / 4).toFloat, "Press mouse left click to play")
-
+    g.drawStringCentered((g.getScreenHeight / 3).toFloat, "Press Enter to play")
   }
 
   override def dispose(): Unit = {
