@@ -19,6 +19,7 @@ import lethalmudry.{Counter, LevelManager, Light, PopUp}
 import objects.{Battery, Bolt, Heal, Water}
 
 import scala.collection.mutable.ArrayBuffer
+import scala.util.Random
 
 /**
  * LethalMudry - Main application
@@ -80,6 +81,10 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     val loadedMap = assets.getMap()
     levelManager.load(loadedMap)
 
+    //Get the spawnable tiles
+    var spawnableTiles = levelManager.getListSpawnable()
+    println(spawnableTiles.mkString(","))
+
     // Créer le player au centre de la map
     val playerTexture = assets.getPlayerTexture()
     player = new Player(
@@ -100,24 +105,25 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     val waterTexture = assets.getWaterTexture()
 
     //Generate 15 items in the map
-    for(i <- 0 to 14){
-      var chances: Int = (math.random() * 100).toInt
+    println(s"player's spawn position : ${player.x}/${player.y}")
+    var shuffleSpawn = Random.shuffle(spawnableTiles)
+    println(s"the size of the list : ${shuffleSpawn.size}")
+    for(i <- 0 to 49){
+      var chances: Int = Random.nextInt(100)
 
-      var posX = (math.random() * 1000).toInt
-      var posY = (math.random() * 1000).toInt
+      val (tileX, tileY) = shuffleSpawn(i)
 
-      while(posY > 6500){
-        posY = (math.random() * 1000).toInt
-      }
+      shuffleSpawn.remove(i)
 
-      while(posX > 3200){
-        posX= (math.random() * 1000).toInt
-      }
+      // L'axe X ne change pas (la gauche reste la gauche)
+      val posX = (tileX * levelManager.getTileWidth()) + (levelManager.getTileWidth() / 2f)
+
+      // L'axe Y est inversé : on part du haut et on descend
+      val posY = ((levelManager.getTotalHeight() - 1 - tileY) * levelManager.getTileHeight()) + (levelManager.getTileHeight() / 2f)
 
       if(chances <= 60){
-        var fithy = (math.random()*100).toInt
-        println(fithy)
-        if(fithy >= 50){
+        var fithy = Random.nextInt(100)
+        if(fithy <= 50){
           objectsList.append(new Bolt(posX, posY, boltTexture, 32, 45f))
         }else {
           objectsList.append(new Water(posX, posY, waterTexture, 32, 45f))
@@ -128,7 +134,7 @@ class LethalMudry extends PortableApplication(1920, 1080) {
         objectsList.append(new Battery(posX, posY, batteryTexture, 32, 45f))
       }
 
-      println(s"the object is at ${posX}/${posY}")
+      println(s"the object (${objectsList(i).getClass.getSimpleName}) is at ${posX}/${posY}")
     }
 
     battery = new Battery(player.x + 250f, player.y + 50f, batteryTexture, 32f, 45f)
@@ -213,7 +219,6 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     player.update(delta, dx, dy)
     playerHitBox.setX(player.x)
     playerHitBox.setY(player.y)
-    println(s"the player is at : ${player.x}/${player.y}")
 
     // Caméra centrée sur le player
     val camera: OrthographicCamera = g.getCamera
