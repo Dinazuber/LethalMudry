@@ -175,7 +175,7 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     inventoryBar = new ProgressBar(0f, 100f, 1f, false, inventorySkin, "mana")
     inventoryBar.setSize(500f, 30f)
     inventoryBar.setAnimateDuration(0.2f)
-    inventoryBar.setValue(90f)
+    inventoryBar.setValue(0f)
     inventoryBar.getStyle.knobBefore.setMinWidth(0f)
 
     //Ajouter les positions des bars
