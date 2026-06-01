@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.Rectangle
 import lethalmudry.LevelManager
 import lethalmudry.Light
 import lethalmudry.ui.menu.MenuScreen
+import lethalmudry.ui.menu.DeathScreen
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar
@@ -37,11 +38,13 @@ class LethalMudry extends PortableApplication(1920, 1080) {
   val assets: GameAssets         = new GameAssets
   val levelManager: LevelManager = new LevelManager
   val menu: MenuScreen           = new MenuScreen
+  val gameOver: DeathScreen = new DeathScreen
   var player: Player             = _
   var playerHitBox: Rectangle = _
   var light: Light = _
   var lastClickedTime: Long = 0L
-   var menuOn: Boolean = true
+   var menuOn: Boolean = true //If the player is in the menu or not
+  var deathOn: Boolean = false //if the player is dead or not
 
   //Style Health Bar
   var healthAtlas: TextureAtlas = _
@@ -192,9 +195,12 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     //Init the music player
     music = new MusicPlayer("data/music/lethalOST.mp3")
     music.play()
+    gameOver.onInit()
+    menu.onInit()
   }
 
   override def onGraphicRender(g: GdxGraphics): Unit = {
+    if(healthBar.getValue <= 0) deathOn = true
     if(menuOn){
       menu.onGraphicRender(g)
       if(Gdx.input.isKeyPressed(Input.Keys.ENTER)){
@@ -203,7 +209,16 @@ class LethalMudry extends PortableApplication(1920, 1080) {
       else{
         menuOn = true
       }
-    }else{
+    }else if(deathOn) {
+      gameOver.onGraphicRender(g)
+      if(Gdx.input.isKeyPressed(Input.Keys.ENTER)){
+        deathOn = false
+        healthBar.setValue(100f)
+        inventoryBar.setValue(0f)
+      } else {
+        deathOn = true
+      }
+    } else {
     g.clear()
 
     // Inputs
