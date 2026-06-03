@@ -111,7 +111,7 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     println(s"player's spawn position : ${player.x}/${player.y}")
     var shuffleSpawn = Random.shuffle(spawnableTiles)
     println(s"the size of the list : ${shuffleSpawn.size}")
-    for(i <- 0 to 49){
+    for(i <- 0 to 99){
       var chances: Int = Random.nextInt(100)
 
       val (tileX, tileY) = shuffleSpawn(i)
@@ -258,7 +258,7 @@ class LethalMudry extends PortableApplication(1920, 1080) {
           //If the objet in collision is not a heal or a battery
           if(inventoryBar.getValue != 100f) {
             o.collect(player, this)
-            var notif = new PopUp(s"Vous avez ramasser un/e ${o.getClass.getSimpleName}", stage)
+            new PopUp(s"You collected a ${o.getClass.getSimpleName}", stage)
 
             false
           } else {
