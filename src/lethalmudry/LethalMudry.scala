@@ -16,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar
 import com.badlogic.gdx.utils.viewport.ScreenViewport
+import lethalmudry.Enemies.Spider
 import lethalmudry.{Counter, LevelManager, Light, PopUp}
 import objects.{Battery, Bolt, Heal, Water}
 
@@ -71,6 +72,10 @@ class LethalMudry extends PortableApplication(1920, 1080) {
   var battery: Battery = _
   var heal: Heal = _
   var bolt: Bolt = _
+
+  //Game enemies
+  var spider: Spider = _
+
   //Music player
   var music: MusicPlayer = _
 
@@ -107,6 +112,9 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     val boltTexture = assets.getBoltTexture()
     val waterTexture = assets.getWaterTexture()
 
+    //Get enemies textures
+    val spiderTexture = assets.getSpiderTexture()
+
     //Generate 15 items in the map
     println(s"player's spawn position : ${player.x}/${player.y}")
     var shuffleSpawn = Random.shuffle(spawnableTiles)
@@ -140,12 +148,16 @@ class LethalMudry extends PortableApplication(1920, 1080) {
       println(s"the object (${objectsList(i).getClass.getSimpleName}) is at ${posX}/${posY}")
     }
 
+
     battery = new Battery(player.x + 250f, player.y + 50f, batteryTexture, 32f, 45f)
     heal = new Heal(player.x + 270f, player.y + 234f, healTexture, 32, 45f)
     bolt = new Bolt(player.x + 570f, player.y + 234f, boltTexture, 32, 45f)
     objectsList.append(battery)
     objectsList.append(heal)
     objectsList.append(bolt)
+
+    //Show the first enemy
+    spider = new Spider(20, player.x + 250f, player.y + 50f, 10, 32f, 45f, spiderTexture)
 
     //Créer la barre de recharge de la lumière et ajouter les styles
     atlas = new TextureAtlas(Gdx.files.internal("data/styles/lightBar/barStyle.atlas"))
@@ -219,123 +231,129 @@ class LethalMudry extends PortableApplication(1920, 1080) {
         deathOn = true
       }
     } else {
-    g.clear()
+      g.clear()
 
-    // Inputs
-    var dx = 0f
-    var dy = 0f
-    if (Gdx.input.isKeyPressed(Keys.D)) dx += 1f
-    if (Gdx.input.isKeyPressed(Keys.A)) dx -= 1f
-    if (Gdx.input.isKeyPressed(Keys.W)) dy += 1f
-    if (Gdx.input.isKeyPressed(Keys.S)) dy -= 1f
+      // Inputs
+      var dx = 0f
+      var dy = 0f
+      if (Gdx.input.isKeyPressed(Keys.D)) dx += 1f
+      if (Gdx.input.isKeyPressed(Keys.A)) dx -= 1f
+      if (Gdx.input.isKeyPressed(Keys.W)) dy += 1f
+      if (Gdx.input.isKeyPressed(Keys.S)) dy -= 1f
 
-    // Update
-    val delta = Gdx.graphics.getDeltaTime
-    player.update(delta, dx, dy)
-    playerHitBox.setX(player.x)
-    playerHitBox.setY(player.y)
+      // Update
+      val delta = Gdx.graphics.getDeltaTime
+      player.update(delta, dx, dy)
+      playerHitBox.setX(player.x)
+      playerHitBox.setY(player.y)
 
-    // Caméra centrée sur le player
-    val camera: OrthographicCamera = g.getCamera
-    camera.position.set(player.x + 64, player.y + 64, 0)
-    g.zoom(0.25f)
-    camera.update()
+      // Caméra centrée sur le player
+      val camera: OrthographicCamera = g.getCamera
+      camera.position.set(player.x + 64, player.y + 64, 0)
+      g.zoom(0.25f)
+      camera.update()
 
-    // --- Rendu map puis player ---
-    levelManager.render(camera)
-    player.render(g)
+      // --- Rendu map puis player ---
+      levelManager.render(camera)
+      player.render(g)
 
-    for(o <- objectsList){
-      o.render(g)
-    }
+      for (o <- objectsList) {
+        o.render(g)
+      }
 
-    //On vide le "sac" de dessins avant de passer à la lumière
-    g.sbFlush()
-    objectsList.filterInPlace({o =>
-      if(playerHitBox.overlaps(o.hitbox)) {
-        if(!o.isInstanceOf[Heal] && !o.isInstanceOf[Battery]){
-          println(s"this objet is an ${o.getClass.getSimpleName}")
-          //If the objet in collision is not a heal or a battery
-          if(inventoryBar.getValue != 100f) {
-            o.collect(player, this)
-            new PopUp(s"You collected a ${o.getClass.getSimpleName}", stage)
+      //Show the first enemy
+      spider.render(g)
 
-            false
+      if(playerHitBox.overlaps(spider.hitbox)){
+        spider.attack(healthBar)
+      }
+
+      //   On vide le "sac" de dessins avant de passer à la lumière
+        g.sbFlush()
+      objectsList.filterInPlace({ o =>
+        if (playerHitBox.overlaps(o.hitbox)) {
+          if (!o.isInstanceOf[Heal] && !o.isInstanceOf[Battery]) {
+            println(s"this objet is an ${o.getClass.getSimpleName}")
+            //If the objet in collision is not a heal or a battery
+            if (inventoryBar.getValue != 100f) {
+              o.collect(player, this)
+              new PopUp(s"You collected a ${o.getClass.getSimpleName}", stage)
+              false
+            } else {
+              var notif = new PopUp("Votre inventaire est plein!", stage)
+              true
+            }
           } else {
-            var notif = new PopUp("Votre inventaire est plein!", stage)
-            true
+            //It's a heal or a battery, so the player can take it
+            o.collect(player, this)
+            var notif = new PopUp(s"Vous avez ramasser un/e ${o.getClass.getSimpleName}", stage)
+            false
           }
         } else {
-          //It's a heal or a battery, so the player can take it
-          o.collect(player, this)
-          var notif = new PopUp(s"Vous avez ramasser un/e ${o.getClass.getSimpleName}", stage)
-          false
+          true
         }
-      } else {
-        true
+      })
+
+      // --- Lumière du jeu ---
+      //Met à jour le ray handler de la lumière
+      light.updateRayHandler(camera)
+
+      //On check la batterie, s'il en reste ou qu'il y en a qui a été ajouté, on available la light
+      if (lightBar.getValue > 0) {
+        light.avaibleLight()
       }
-    })
 
-    // --- Lumière du jeu ---
-    //Met à jour le ray handler de la lumière
-    light.updateRayHandler(camera)
+      //Update la position de la lumière en fonction du joueur
+      light.updatePosition(player)
 
-    //On check la batterie, s'il en reste ou qu'il y en a qui a été ajouté, on available la light
-    if(lightBar.getValue > 0){
-      light.avaibleLight()
-    }
-
-    //Update la position de la lumière en fonction du joueur
-    light.updatePosition(player)
-
-    //Vérifie si le joueur fait click droit
-    val currentTime = System.currentTimeMillis()
-    if(Gdx.input.isButtonPressed(Input.Buttons.RIGHT)){
-      if(light.isAvailable) {
-        if (currentTime - lastClickedTime > 200) {
-          light.onClick()
-          lastClickedTime = currentTime
-        }
-      }
-    }
-    //Test to recharge batterie
-    if(Gdx.input.isKeyPressed(Input.Keys.C)){
-      lightBar.setValue(1f)
-    }
-
-    //Test to deal damage
-    if(Gdx.input.isKeyJustPressed(Input.Keys.K)){
-      healthBar.setValue(healthBar.getValue - 10f)
-    }
-
-    //Heal player
-    if(Gdx.input.isKeyJustPressed(Input.Keys.H)){
-      healthBar.setValue(healthBar.getValue + 10f)
-    }
-
-    //Si la lumière est active et depuis plus d'une seconde, baisse sa vie
-    if(light.lightStatus()){
-      if(currentTime - counterManager.getStartedTime() >= 1000){
-        counterManager.resetStartValue()
-        if(light.isAvailable) {
-          if (lightBar.getValue != 0) {
-            println("BOOM, ça fait 1 seconde cheh")
-            lightBar.setValue(lightBar.getValue - 0.01f)
-          } else {
-            light.disableLight()
+      //Vérifie si le joueur fait click droit
+      val currentTime = System.currentTimeMillis()
+      if (Gdx.input.isButtonPressed(Input.Buttons.RIGHT)) {
+        if (light.isAvailable) {
+          if (currentTime - lastClickedTime > 200) {
+            light.onClick()
+            lastClickedTime = currentTime
           }
         }
       }
-    } else {
-      counterManager.resetStartValue()
-    }
+      //Test to recharge batterie
+      if (Gdx.input.isKeyPressed(Input.Keys.C)) {
+        lightBar.setValue(1f)
+      }
 
-    //Met a jour les éléments graphiques du jeu (progressbar)
-    stage.getViewport.update(Gdx.graphics.getWidth, Gdx.graphics.getHeight, true)
-    stage.act(delta)
-    stage.draw()
+      //Test to deal damage
+      if (Gdx.input.isKeyJustPressed(Input.Keys.K)) {
+        healthBar.setValue(healthBar.getValue - 10f)
+      }
 
-    g.drawFPS()
+      //Heal player
+      if (Gdx.input.isKeyJustPressed(Input.Keys.H)) {
+        healthBar.setValue(healthBar.getValue + 10f)
+      }
+
+      //Si la lumière est active et depuis plus d'une seconde, baisse sa vie
+      if (light.lightStatus()) {
+        if (currentTime - counterManager.getStartedTime() >= 1000) {
+          counterManager.resetStartValue()
+          if (light.isAvailable) {
+            if (lightBar.getValue != 0) {
+              println("BOOM, ça fait 1 seconde cheh")
+              lightBar.setValue(lightBar.getValue - 0.01f)
+            } else {
+              light.disableLight()
+            }
+          }
+        }
+      } else {
+        counterManager.resetStartValue()
+      }
+
+      //Met a jour les éléments graphiques du jeu (progressbar)
+      stage.getViewport.update(Gdx.graphics.getWidth, Gdx.graphics.getHeight, true)
+      stage.act(delta)
+      stage.draw()
+
+      g.drawFPS()
     }
   }
 }
