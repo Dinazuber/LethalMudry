@@ -6,7 +6,7 @@ import ch.hevs.gdx2d.desktop.PortableApplication
 import com.badlogic.gdx.{Gdx, Input}
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
-import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.{OrthographicCamera, Texture}
 import com.badlogic.gdx.math.Rectangle
 import lethalmudry.LevelManager
 import lethalmudry.Light
@@ -73,6 +73,18 @@ class LethalMudry extends PortableApplication(1920, 1080) {
   var heal: Heal = _
   var bolt: Bolt = _
 
+  //Game objects sprite
+  var batteryTexture : Texture = _
+  var healTexture : Texture = _
+  var boltTexture : Texture = _
+  var waterTexture : Texture = _
+
+  //Get enemies textures
+  var spiderTexture : Texture = _
+
+  //Objects list
+  var spawnableTiles: ArrayBuffer[(Int, Int)] = _
+
   //Game enemies
   var spider: Spider = _
 
@@ -85,12 +97,23 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     assets.loadAll()
     assets.manager.finishLoading()
 
+    //Load all the sprite
+    batteryTexture = assets.getBatteryTexture()
+    healTexture = assets.getHealTexture()
+    boltTexture = assets.getBoltTexture()
+    waterTexture = assets.getWaterTexture()
+
+    //Get enemies textures
+    spiderTexture = assets.getSpiderTexture()
+
+
     // Charger la map
     val loadedMap = assets.getMap()
     levelManager.load(loadedMap)
 
+    spawnableTiles = levelManager.getListSpawnable()
+
     //Get the spawnable tiles
-    var spawnableTiles = levelManager.getListSpawnable()
     println(spawnableTiles.mkString(","))
 
     // Créer le player au centre de la map
@@ -106,48 +129,7 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     light = new Light(player.x, player.y)
     light.generateLight()
 
-    //Ajouter des objets randoms
-    val batteryTexture = assets.getBatteryTexture()
-    val healTexture = assets.getHealTexture()
-    val boltTexture = assets.getBoltTexture()
-    val waterTexture = assets.getWaterTexture()
-
-    //Get enemies textures
-    val spiderTexture = assets.getSpiderTexture()
-
-    //Generate 15 items in the map
-    println(s"player's spawn position : ${player.x}/${player.y}")
-    var shuffleSpawn = Random.shuffle(spawnableTiles)
-    println(s"the size of the list : ${shuffleSpawn.size}")
-    for(i <- 0 to 99){
-      var chances: Int = Random.nextInt(100)
-
-      val (tileX, tileY) = shuffleSpawn(i)
-
-      shuffleSpawn.remove(i)
-
-      // L'axe X ne change pas (la gauche reste la gauche)
-      val posX = (tileX * levelManager.getTileWidth()) + (levelManager.getTileWidth() / 2f)
-
-      // L'axe Y est inversé : on part du haut et on descend
-      val posY = ((levelManager.getTotalHeight() - 1 - tileY) * levelManager.getTileHeight()) + (levelManager.getTileHeight() / 2f)
-
-      if(chances <= 60){
-        var fithy = Random.nextInt(100)
-        if(fithy <= 50){
-          objectsList.append(new Bolt(posX, posY, boltTexture, 32, 45f))
-        }else {
-          objectsList.append(new Water(posX, posY, waterTexture, 32, 45f))
-        }
-      } else if(chances <= 80){
-        objectsList.append(new Heal(posX, posY, healTexture, 32, 45f))
-      } else {
-        objectsList.append(new Battery(posX, posY, batteryTexture, 32, 45f))
-      }
-
-      println(s"the object (${objectsList(i).getClass.getSimpleName}) is at ${posX}/${posY}")
-    }
-
+    spawnRandomObject(spawnableTiles)
 
     battery = new Battery(player.x + 250f, player.y + 50f, batteryTexture, 32f, 45f)
     heal = new Heal(player.x + 270f, player.y + 234f, healTexture, 32, 45f)
@@ -157,7 +139,7 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     objectsList.append(bolt)
 
     //Show the first enemy
-    spider = new Spider(20, player.x + 250f, player.y + 50f, 32f, 45f, spiderTexture)
+    spider = new Spider(20, player.x + 250f, player.y + 50f, 64f, 64f, spiderTexture)
 
     //Créer la barre de recharge de la lumière et ajouter les styles
     atlas = new TextureAtlas(Gdx.files.internal("data/styles/lightBar/barStyle.atlas"))
@@ -172,6 +154,8 @@ class LethalMudry extends PortableApplication(1920, 1080) {
 
     //Start one second counter (to decrease light battery
     counterManager.startCounter()
+    spider.startCounterTimeOut()
+    println(spider.getTimeOut())
 
     //Créer la barre de vie du personnage
     healthAtlas = new TextureAtlas(Gdx.files.internal("data/styles/healthBar/healthBar.atlas"))
@@ -225,8 +209,18 @@ class LethalMudry extends PortableApplication(1920, 1080) {
       gameOver.onGraphicRender(g)
       if(Gdx.input.isKeyPressed(Input.Keys.ENTER)){
         deathOn = false
+
+        //Reset player's position
+        player.x = levelManager.mapPixelWidth / 2
+        player.y = levelManager.mapPixelHeight / 10
+
+        //Reset progress bar
         healthBar.setValue(100f)
         inventoryBar.setValue(0f)
+        lightBar.setValue(100f)
+
+        //Reset objects spawning
+        spawnRandomObject(spawnableTiles)
       } else {
         deathOn = true
       }
@@ -265,7 +259,12 @@ class LethalMudry extends PortableApplication(1920, 1080) {
       spider.render(g)
 
       if(playerHitBox.overlaps(spider.hitbox)){
-        spider.attack(healthBar)
+        var currentTime = System.currentTimeMillis()
+        if((currentTime - spider.getTimeOut()) >= 1000) {
+          spider.resetTime()
+          println(s"a second past + the spider attacked the player")
+          spider.attack(healthBar)
+        }
       }
 
       //   On vide le "sac" de dessins avant de passer à la lumière
@@ -354,6 +353,42 @@ class LethalMudry extends PortableApplication(1920, 1080) {
       stage.draw()
 
       g.drawFPS()
+    }
+  }
+
+  /**
+   * Spawn randomly the objects of a list
+   * @param validTiles
+   */
+  def spawnRandomObject(validTiles: ArrayBuffer[(Int, Int)]): Unit = {
+    for(i <- 0 to 99){
+      var shuffleSpawn = Random.shuffle(validTiles)
+      var chances: Int = Random.nextInt(100)
+
+      val (tileX, tileY) = shuffleSpawn(i)
+
+      shuffleSpawn.remove(i)
+
+      // L'axe X ne change pas (la gauche reste la gauche)
+      val posX = (tileX * levelManager.getTileWidth()) + (levelManager.getTileWidth() / 2f)
+
+      // L'axe Y est inversé : on part du haut et on descend
+      val posY = ((levelManager.getTotalHeight() - 1 - tileY) * levelManager.getTileHeight()) + (levelManager.getTileHeight() / 2f)
+
+      if(chances <= 60){
+        var fithy = Random.nextInt(100)
+        if(fithy <= 50){
+          objectsList.append(new Bolt(posX, posY, boltTexture, 32, 45f))
+        }else {
+          objectsList.append(new Water(posX, posY, waterTexture, 32, 45f))
+        }
+      } else if(chances <= 80){
+        objectsList.append(new Heal(posX, posY, healTexture, 32, 45f))
+      } else {
+        objectsList.append(new Battery(posX, posY, batteryTexture, 32, 45f))
+      }
+
+      println(s"the object (${objectsList(i).getClass.getSimpleName}) is at ${posX}/${posY}")
     }
   }
 }
