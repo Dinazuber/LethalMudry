@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.Rectangle
 import lethalmudry.LevelManager
 import lethalmudry.Light
 import lethalmudry.ui.menu.MenuScreen
+import lethalmudry.ui.menu.DeathScreen
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar
@@ -19,6 +20,7 @@ import lethalmudry.{Counter, LevelManager, Light, PopUp}
 import objects.{Battery, Bolt, Heal, Water}
 
 import scala.collection.mutable.ArrayBuffer
+import scala.util.Random
 
 /**
  * LethalMudry - Main application
@@ -36,11 +38,13 @@ class LethalMudry extends PortableApplication(1920, 1080) {
   val assets: GameAssets         = new GameAssets
   val levelManager: LevelManager = new LevelManager
   val menu: MenuScreen           = new MenuScreen
+  val gameOver: DeathScreen = new DeathScreen
   var player: Player             = _
   var playerHitBox: Rectangle = _
   var light: Light = _
   var lastClickedTime: Long = 0L
-   var menuOn: Boolean = true
+   var menuOn: Boolean = true //If the player is in the menu or not
+  var deathOn: Boolean = false //if the player is dead or not
 
   //Style Health Bar
   var healthAtlas: TextureAtlas = _
@@ -80,6 +84,10 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     val loadedMap = assets.getMap()
     levelManager.load(loadedMap)
 
+    //Get the spawnable tiles
+    var spawnableTiles = levelManager.getListSpawnable()
+    println(spawnableTiles.mkString(","))
+
     // Créer le player au centre de la map
     val playerTexture = assets.getPlayerTexture()
     player = new Player(
@@ -100,24 +108,25 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     val waterTexture = assets.getWaterTexture()
 
     //Generate 15 items in the map
-    for(i <- 0 to 14){
-      var chances: Int = (math.random() * 100).toInt
+    println(s"player's spawn position : ${player.x}/${player.y}")
+    var shuffleSpawn = Random.shuffle(spawnableTiles)
+    println(s"the size of the list : ${shuffleSpawn.size}")
+    for(i <- 0 to 99){
+      var chances: Int = Random.nextInt(100)
 
-      var posX = (math.random() * 1000).toInt
-      var posY = (math.random() * 1000).toInt
+      val (tileX, tileY) = shuffleSpawn(i)
 
-      while(posY > 6500){
-        posY = (math.random() * 1000).toInt
-      }
+      shuffleSpawn.remove(i)
 
-      while(posX > 3200){
-        posX= (math.random() * 1000).toInt
-      }
+      // L'axe X ne change pas (la gauche reste la gauche)
+      val posX = (tileX * levelManager.getTileWidth()) + (levelManager.getTileWidth() / 2f)
+
+      // L'axe Y est inversé : on part du haut et on descend
+      val posY = ((levelManager.getTotalHeight() - 1 - tileY) * levelManager.getTileHeight()) + (levelManager.getTileHeight() / 2f)
 
       if(chances <= 60){
-        var fithy = (math.random()*100).toInt
-        println(fithy)
-        if(fithy >= 50){
+        var fithy = Random.nextInt(100)
+        if(fithy <= 50){
           objectsList.append(new Bolt(posX, posY, boltTexture, 32, 45f))
         }else {
           objectsList.append(new Water(posX, posY, waterTexture, 32, 45f))
@@ -128,7 +137,7 @@ class LethalMudry extends PortableApplication(1920, 1080) {
         objectsList.append(new Battery(posX, posY, batteryTexture, 32, 45f))
       }
 
-      println(s"the object is at ${posX}/${posY}")
+      println(s"the object (${objectsList(i).getClass.getSimpleName}) is at ${posX}/${posY}")
     }
 
     battery = new Battery(player.x + 250f, player.y + 50f, batteryTexture, 32f, 45f)
@@ -186,9 +195,12 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     //Init the music player
     music = new MusicPlayer("data/music/lethalOST.mp3")
     music.play()
+    gameOver.onInit()
+    menu.onInit()
   }
 
   override def onGraphicRender(g: GdxGraphics): Unit = {
+    if(healthBar.getValue <= 0) deathOn = true
     if(menuOn){
       menu.onGraphicRender(g)
       if(Gdx.input.isKeyPressed(Input.Keys.ENTER)){
@@ -197,7 +209,16 @@ class LethalMudry extends PortableApplication(1920, 1080) {
       else{
         menuOn = true
       }
-    }else{
+    }else if(deathOn) {
+      gameOver.onGraphicRender(g)
+      if(Gdx.input.isKeyPressed(Input.Keys.ENTER)){
+        deathOn = false
+        healthBar.setValue(100f)
+        inventoryBar.setValue(0f)
+      } else {
+        deathOn = true
+      }
+    } else {
     g.clear()
 
     // Inputs
@@ -213,7 +234,6 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     player.update(delta, dx, dy)
     playerHitBox.setX(player.x)
     playerHitBox.setY(player.y)
-    println(s"the player is at : ${player.x}/${player.y}")
 
     // Caméra centrée sur le player
     val camera: OrthographicCamera = g.getCamera
@@ -233,10 +253,24 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     g.sbFlush()
     objectsList.filterInPlace({o =>
       if(playerHitBox.overlaps(o.hitbox)) {
-        o.collect(player, this)
-        var notif = new PopUp(s"Vous avez ramasser un/e ${o.getClass.getSimpleName}", stage)
+        if(!o.isInstanceOf[Heal] && !o.isInstanceOf[Battery]){
+          println(s"this objet is an ${o.getClass.getSimpleName}")
+          //If the objet in collision is not a heal or a battery
+          if(inventoryBar.getValue != 100f) {
+            o.collect(player, this)
+            new PopUp(s"You collected a ${o.getClass.getSimpleName}", stage)
 
-        false
+            false
+          } else {
+            var notif = new PopUp("Votre inventaire est plein!", stage)
+            true
+          }
+        } else {
+          //It's a heal or a battery, so the player can take it
+          o.collect(player, this)
+          var notif = new PopUp(s"Vous avez ramasser un/e ${o.getClass.getSimpleName}", stage)
+          false
+        }
       } else {
         true
       }
