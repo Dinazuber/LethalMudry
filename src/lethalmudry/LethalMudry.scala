@@ -253,9 +253,24 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     g.sbFlush()
     objectsList.filterInPlace({o =>
       if(playerHitBox.overlaps(o.hitbox)) {
-        o.collect(player, this)
-        new PopUp(s"You collected a ${o.getClass.getSimpleName}", stage)
-        false
+        if(!o.isInstanceOf[Heal] && !o.isInstanceOf[Battery]){
+          println(s"this objet is an ${o.getClass.getSimpleName}")
+          //If the objet in collision is not a heal or a battery
+          if(inventoryBar.getValue != 100f) {
+            o.collect(player, this)
+            new PopUp(s"You collected a ${o.getClass.getSimpleName}", stage)
+
+            false
+          } else {
+            var notif = new PopUp("Votre inventaire est plein!", stage)
+            true
+          }
+        } else {
+          //It's a heal or a battery, so the player can take it
+          o.collect(player, this)
+          var notif = new PopUp(s"Vous avez ramasser un/e ${o.getClass.getSimpleName}", stage)
+          false
+        }
       } else {
         true
       }
