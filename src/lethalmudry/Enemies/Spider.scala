@@ -15,18 +15,16 @@ import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar
  * @param width the width of the sprite
  * @param height the height of the sprite
  */
-class Spider(hp: Float, posX: Float, posY: Float, damage: Float, width: Float, height: Float, texture: Texture)
-  extends Enemies(hp, posX, posY, damage, width, height, texture) {
+class Spider(hp: Float, posX: Float, posY: Float, width: Float, height: Float, texture: Texture)
+  extends Enemies(hp, posX, posY, width, height, texture) {
   override def attack(healthBar: ProgressBar): Unit = {
     println(s"The spider just attacked you!")
-    healthBar.setValue(healthBar.getValue - damage)
+    healthBar.setValue(healthBar.getValue - 10)
   }
 
   override def trackPlayer(player: Player): Unit = {
 
   }
 
-  def render(g: GdxGraphics): Unit = {
-    g.draw(texture, posX, posY, width, height)
-  }
+  override def render(g: GdxGraphics): Unit = super.render(g)
 }

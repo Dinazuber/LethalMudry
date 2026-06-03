@@ -157,7 +157,7 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     objectsList.append(bolt)
 
     //Show the first enemy
-    spider = new Spider(20, player.x + 250f, player.y + 50f, 10, 32f, 45f, spiderTexture)
+    spider = new Spider(20, player.x + 250f, player.y + 50f, 32f, 45f, spiderTexture)
 
     //Créer la barre de recharge de la lumière et ajouter les styles
     atlas = new TextureAtlas(Gdx.files.internal("data/styles/lightBar/barStyle.atlas"))
