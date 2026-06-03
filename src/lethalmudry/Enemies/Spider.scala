@@ -5,6 +5,7 @@ import ch.hevs.gdx2d.lib.GdxGraphics
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar
+import lethalmudry.Counter
 
 /**
  * Create a spider in the game

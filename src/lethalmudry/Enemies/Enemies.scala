@@ -5,10 +5,24 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g3d.particles.values.PrimitiveSpawnShapeValue.SpawnSide
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar
+import lethalmudry.Counter
 
 abstract class Enemies(hp: Float, posX: Float, posY: Float, width: Float, height: Float, texture: Texture) {
+  var timeOut: Counter = new Counter
   val hitbox: Rectangle = new Rectangle(posX, posY, width, height)
   def attack(healthBar: ProgressBar): Unit = {}
+
+  def startCounterTimeOut(): Unit = {
+    timeOut.startCounter()
+  }
+
+  def getTimeOut(): Long = {
+    timeOut.getStartedTime()
+  }
+
+  def resetTime(): Unit = {
+    timeOut.resetStartValue()
+  }
 
   def move(): Unit = { }
 
