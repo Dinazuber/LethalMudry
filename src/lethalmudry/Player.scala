@@ -102,7 +102,7 @@ class Player(texture: Texture, startX: Float, startY: Float, level: LevelManager
   def getPosX(posX: Float): Float = { x = posX; x }
   def getPosY(posY: Float): Float  = { y = posY; y }
 
-  private def isHitboxColliding(testX: Float, testY: Float): Boolean = {
+  def isHitboxColliding(testX: Float, testY: Float): Boolean = {
     val boxLeft   = testX + hitOffsetX
     val boxRight  = boxLeft  + hitWidth
     val boxBottom = testY + hitOffsetY

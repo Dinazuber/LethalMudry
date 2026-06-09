@@ -14,9 +14,12 @@ abstract class Enemies(hp: Float, posX: Float, posY: Float, width: Float, height
   val regions: Array[Array[TextureRegion]] = TextureRegion.split(texture, FRAME_WIDTH, FRAME_HEIGHT)
 
   var currentFrame: TextureRegion = regions(0)(0)
+  val range: Float = 300.0f
 
   var timeOut: Counter = new Counter
   val hitbox: Rectangle = new Rectangle(posX, posY, width, height)
+
+
   def attack(healthBar: ProgressBar): Unit = {}
 
   def startCounterTimeOut(): Unit = {
@@ -31,39 +34,50 @@ abstract class Enemies(hp: Float, posX: Float, posY: Float, width: Float, height
     timeOut.resetStartValue()
   }
 
-  def move(): Unit = { }
+  def inRange(player: Player): Boolean = {
+    //Get diff of X and Y
+    val diffX = player.x - hitbox.x
+    val diffY = player.y - hitbox.y
+
+    val distCarree = math.pow(diffX, 2) + math.pow(diffY, 2)
+
+    val rangeCarree = math.pow(range, 2)
+
+    return distCarree <= rangeCarree
+  }
 
   def trackPlayer(player: Player): Unit = {
-    println(s"${player.x}/${player.y}")
-    var speed: Float = 1.0f //we set a speed for the enemie
+    val diffX = player.x - hitbox.x //diff of X of player and enemy
+    val diffY = player.y - hitbox.y //diff of Y of player and enemy
+    val speed: Float = 1.5f
 
-    //We adjust the enemy position with the speed
-    if(hitbox.x < player.x){
-      hitbox.x += speed
-      //If the enemy doesnt have animation
-      try{
-        currentFrame = regions(1)(0)
-      }
-      println(s"pos x : ${hitbox.x}")
-    } else if(hitbox.x > player.x){
-      hitbox.x -= speed
-      try{
-        currentFrame = regions(2)(0)
-      }
+    //Update X position
+    var nextX = hitbox.x
+    if (diffX > 0) nextX += speed
+    else if (diffX < 0) nextX -= speed
+
+    if(!player.isHitboxColliding(nextX, hitbox.y)){
+      hitbox.x = nextX
     }
 
+    // Update Y position
+    var nextY = hitbox.y
+    if (diffY > 0) nextY += speed
+    else if (diffY < 0) nextY -= speed
 
-    //We do the same for the Y axe
-    if(hitbox.y < player.y){
-      hitbox.y += speed
-      try{
-        currentFrame = regions(3)(0)
-      }
-    } else if(hitbox.y > player.y){
-      hitbox.y -= speed
-      try{
-        currentFrame = regions(0)(0)
-      }
+    if(!player.isHitboxColliding(hitbox.x, nextY)){
+      hitbox.y = nextY
+    }
+
+    // we get value absolute of X and Y
+    if (math.abs(diffX) > math.abs(diffY)) {
+      // horizontal
+      if (diffX > 0) currentFrame = regions(1)(0) // Right
+      else if (diffX < 0) currentFrame = regions(2)(0) // Left
+    } else {
+      // vertical
+      if (diffY > 0) currentFrame = regions(3)(0) // top
+      else if (diffY < 0) currentFrame = regions(0)(0) // bot
     }
   }
 

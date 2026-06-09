@@ -16,7 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar
 import com.badlogic.gdx.utils.viewport.ScreenViewport
-import lethalmudry.Enemies.{DemonMudry, Spider}
+import lethalmudry.Enemies.{DemonMudry, Enemies, Spider}
 import lethalmudry.{Counter, LevelManager, Light, PopUp}
 import objects.{Battery, Bolt, Heal, Water}
 
@@ -92,6 +92,7 @@ class LethalMudry extends PortableApplication(1920, 1080) {
 
   //Music player
   var music: MusicPlayer = _
+  var ouch: MusicPlayer = _
 
   override def onInit(): Unit = {
     setTitle("LethalMudry")
@@ -249,7 +250,7 @@ class LethalMudry extends PortableApplication(1920, 1080) {
       // Caméra centrée sur le player
       val camera: OrthographicCamera = g.getCamera
       camera.position.set(player.x + 64, player.y + 64, 0)
-      g.zoom(0.25f)
+      //g.zoom(0.25f)
       camera.update()
 
       // --- Rendu map puis player ---
@@ -261,13 +262,18 @@ class LethalMudry extends PortableApplication(1920, 1080) {
       }
 
       //Show the first enemy
-      //spider.trackPlayer(player) //we make the spider track the player
+      if(spider.inRange(player)){
+        spider.trackPlayer(player)
+      }
       //spider.render(g) //and update the render
 
-      mudry.trackPlayer(player)
+      //We check if player is in range or not
+      if(mudry.inRange(player)){
+        mudry.trackPlayer(player)
+      }
       mudry.render(g)
 
-      if(playerHitBox.overlaps(spider.hitbox)){
+      if(playerHitBox.overlaps(mudry.hitbox)){
         var currentTime = System.currentTimeMillis()
         if((currentTime - spider.getTimeOut()) >= 1000) {
           spider.resetTime()
@@ -398,6 +404,18 @@ class LethalMudry extends PortableApplication(1920, 1080) {
       }
 
       println(s"the object (${objectsList(i).getClass.getSimpleName}) is at ${posX}/${posY}")
+    }
+  }
+
+  def spawnEnemies(enemy: Enemies): Unit = {
+    val maxW = levelManager.getTotalWidth() * levelManager.getTileWidth()
+    val maxH = levelManager.getTotalHeight() * levelManager.getTileHeight()
+
+    val posX = Random.nextFloat() * maxW
+    val posY = Random.nextFloat() * maxH
+
+    if(!levelManager.collisions(posX, posY)){
+
     }
   }
 }
