@@ -1,5 +1,6 @@
 package ch.hevs.gdx2d.lethalmudry {
 
+  import com.badlogic.gdx.Gdx
   import com.badlogic.gdx.assets.AssetManager
   import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
   import com.badlogic.gdx.graphics.Texture
@@ -15,6 +16,8 @@ package ch.hevs.gdx2d.lethalmudry {
     private val HEAL_PATH = "data/images/heal.png"
     private val BOLT_PATH = "data/images/scrap/big_bolt.png"
     private val WATER_PATH = "data/images/scrap/water.png"
+    private val SHIP_PATH = "data/images/SpaceShip.png"
+
 
     def loadAll(): Unit = {
       manager.setLoader(classOf[TiledMap], new TmxMapLoader(new InternalFileHandleResolver))
@@ -24,6 +27,7 @@ package ch.hevs.gdx2d.lethalmudry {
       manager.load(HEAL_PATH, classOf[Texture])
       manager.load(BOLT_PATH, classOf[Texture])
       manager.load(WATER_PATH, classOf[Texture])
+      manager.load(SHIP_PATH, classOf[Texture])
     }
 
     def updateLoading(): Boolean = {
@@ -52,6 +56,10 @@ package ch.hevs.gdx2d.lethalmudry {
 
     def getWaterTexture(): Texture = {
       manager.get(WATER_PATH, classOf[Texture])
+    }
+
+    def getShipTexture(): Texture = {
+      manager.get(SHIP_PATH, classOf[Texture])
     }
 
     override def dispose(): Unit = {
