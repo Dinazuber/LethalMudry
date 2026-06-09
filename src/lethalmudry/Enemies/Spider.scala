@@ -23,9 +23,7 @@ class Spider(hp: Float, posX: Float, posY: Float, width: Float, height: Float, t
     healthBar.setValue(healthBar.getValue - 10)
   }
 
-  override def trackPlayer(player: Player): Unit = {
-
-  }
+  override def trackPlayer(player: Player): Unit = super.trackPlayer(player)
 
   override def render(g: GdxGraphics): Unit = super.render(g)
 }

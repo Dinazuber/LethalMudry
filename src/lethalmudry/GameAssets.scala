@@ -16,6 +16,7 @@ package ch.hevs.gdx2d.lethalmudry {
     private val BOLT_PATH = "data/images/scrap/big_bolt.png"
     private val WATER_PATH = "data/images/scrap/water.png"
     private val SPIDER_PATH = "data/images/enemies/spider.png"
+    private val MUDRY_PATH = "data/images/enemies/saint-mudry.png"
 
     /**
      * Load all the sprite of the game's items
@@ -29,6 +30,7 @@ package ch.hevs.gdx2d.lethalmudry {
       manager.load(BOLT_PATH, classOf[Texture])
       manager.load(WATER_PATH, classOf[Texture])
       manager.load(SPIDER_PATH, classOf[Texture])
+      manager.load(MUDRY_PATH, classOf[Texture])
     }
 
     /**
@@ -93,6 +95,10 @@ package ch.hevs.gdx2d.lethalmudry {
      */
     def getSpiderTexture(): Texture = {
       manager.get(SPIDER_PATH, classOf[Texture])
+    }
+
+    def getMudryTexture(): Texture = {
+      manager.get(MUDRY_PATH, classOf[Texture])
     }
 
     override def dispose(): Unit = {

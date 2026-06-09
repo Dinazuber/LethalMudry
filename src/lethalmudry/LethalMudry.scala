@@ -16,7 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar
 import com.badlogic.gdx.utils.viewport.ScreenViewport
-import lethalmudry.Enemies.Spider
+import lethalmudry.Enemies.{DemonMudry, Spider}
 import lethalmudry.{Counter, LevelManager, Light, PopUp}
 import objects.{Battery, Bolt, Heal, Water}
 
@@ -81,12 +81,14 @@ class LethalMudry extends PortableApplication(1920, 1080) {
 
   //Get enemies textures
   var spiderTexture : Texture = _
+  var mudryTexture : Texture = _
 
   //Objects list
   var spawnableTiles: ArrayBuffer[(Int, Int)] = _
 
   //Game enemies
   var spider: Spider = _
+  var mudry: DemonMudry = _
 
   //Music player
   var music: MusicPlayer = _
@@ -105,6 +107,7 @@ class LethalMudry extends PortableApplication(1920, 1080) {
 
     //Get enemies textures
     spiderTexture = assets.getSpiderTexture()
+    mudryTexture = assets.getMudryTexture()
 
 
     // Charger la map
@@ -140,6 +143,7 @@ class LethalMudry extends PortableApplication(1920, 1080) {
 
     //Show the first enemy
     spider = new Spider(20, player.x + 250f, player.y + 50f, 64f, 64f, spiderTexture)
+    mudry = new DemonMudry(20, player.x + 250f, player.y - 50f, 64f, 64f, mudryTexture)
 
     //Créer la barre de recharge de la lumière et ajouter les styles
     atlas = new TextureAtlas(Gdx.files.internal("data/styles/lightBar/barStyle.atlas"))
@@ -155,6 +159,7 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     //Start one second counter (to decrease light battery
     counterManager.startCounter()
     spider.startCounterTimeOut()
+    mudry.startCounterTimeOut()
     println(spider.getTimeOut())
 
     //Créer la barre de vie du personnage
@@ -256,7 +261,11 @@ class LethalMudry extends PortableApplication(1920, 1080) {
       }
 
       //Show the first enemy
-      spider.render(g)
+      //spider.trackPlayer(player) //we make the spider track the player
+      //spider.render(g) //and update the render
+
+      mudry.trackPlayer(player)
+      mudry.render(g)
 
       if(playerHitBox.overlaps(spider.hitbox)){
         var currentTime = System.currentTimeMillis()
