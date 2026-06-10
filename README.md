@@ -83,4 +83,6 @@ La bibliothèque `gdx2d` est incluse directement dans le dossier `libs/`. Les so
 ## 🎥 Gameplay
 
 Voici une vidéo de 15 secondes résumant notre jeu :
-https://github.com/Dinazuber/LethalMudry/blob/main/data/videos/DemoJeu.mp4
+https://github.com/user-attachments/assets/3ca71ca4-7e1e-4869-8985-fab75fba5f92
+
+
