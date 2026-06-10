@@ -9,8 +9,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.graphics.{OrthographicCamera, Texture}
 import com.badlogic.gdx.math.Rectangle
 import lethalmudry.{Counter, LevelManager, Light, PopUp}
-import lethalmudry.ui.menu.MenuScreen
-import lethalmudry.ui.menu.DeathScreen
+import lethalmudry.ui.menu.{DeathScreen, MenuScreen, WinningScreen}
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar
@@ -38,7 +37,8 @@ class LethalMudry extends PortableApplication(1920, 1080) {
   val assets: GameAssets         = new GameAssets
   val levelManager: LevelManager = new LevelManager
   val menu: MenuScreen           = new MenuScreen
-  val gameOver: DeathScreen = new DeathScreen
+  val gameOver: DeathScreen      = new DeathScreen
+  val winScreen: WinningScreen   = new WinningScreen
   var player: Player             = _
   var playerHitBox: Rectangle = _
   var light: Light = _
@@ -214,6 +214,7 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     music.play()
     gameOver.onInit()
     menu.onInit()
+    winScreen.onInit()
   }
 
   override def onGraphicRender(g: GdxGraphics): Unit = {
@@ -249,7 +250,29 @@ class LethalMudry extends PortableApplication(1920, 1080) {
       } else {
         deathOn = true
       }
-    } else {
+    }
+    else if(quotaBar.getValue == 400f){
+      winScreen.onGraphicRender(g)
+      if(Gdx.input.isKeyPressed(Input.Keys.ENTER)){
+
+        //Reset player's position
+        player.x = levelManager.mapPixelWidth / 2
+        player.y = levelManager.mapPixelHeight / 10
+
+        //Reset progress bar
+        healthBar.setValue(100f)
+        inventoryBar.setValue(0f)
+        lightBar.setValue(100f)
+
+        //Reset objects and enemies spawning
+        objectsList.empty
+        enemiesList.empty
+        spawnRandomObject(spawnableTiles)
+        spawnEnemies(spawnableTiles)
+        quotaBar.setValue(0f)
+      }
+    }
+    else {
       g.clear()
 
       // Inputs

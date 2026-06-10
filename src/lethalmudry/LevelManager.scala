@@ -90,7 +90,7 @@ package lethalmudry {
       }
 
       spawnableTiles
-    }
+  }
 
     def render(camera: OrthographicCamera): Unit = {
       if (mapRenderer != null) {
