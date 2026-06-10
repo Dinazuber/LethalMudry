@@ -8,17 +8,17 @@ import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.math.Rectangle
-import lethalmudry.LevelManager
-import lethalmudry.Light
+import lethalmudry.{Counter, LevelManager, Light, PopUp}
 import lethalmudry.ui.menu.MenuScreen
+import lethalmudry.ui.menu.DeathScreen
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar
 import com.badlogic.gdx.utils.viewport.ScreenViewport
-import lethalmudry.{Counter, LevelManager, Light, PopUp}
-import objects.{Battery, Bolt, Heal, Water}
+import objects.{Battery, Bolt, Heal, Ship, Water}
 
 import scala.collection.mutable.ArrayBuffer
+import scala.util.Random
 
 /**
  * LethalMudry - Main application
@@ -36,11 +36,13 @@ class LethalMudry extends PortableApplication(1920, 1080) {
   val assets: GameAssets         = new GameAssets
   val levelManager: LevelManager = new LevelManager
   val menu: MenuScreen           = new MenuScreen
+  val gameOver: DeathScreen = new DeathScreen
   var player: Player             = _
   var playerHitBox: Rectangle = _
   var light: Light = _
   var lastClickedTime: Long = 0L
-   var menuOn: Boolean = true
+  var menuOn: Boolean = true //If the player is in the menu or not
+  var deathOn: Boolean = false //if the player is dead or not
 
   //Style Health Bar
   var healthAtlas: TextureAtlas = _
@@ -61,12 +63,14 @@ class LethalMudry extends PortableApplication(1920, 1080) {
   var inventoryAtlas: TextureAtlas = _
   var inventorySkin : Skin = _
   var inventoryBar : ProgressBar = _
+  var quotaBar: ProgressBar = _
 
   //Game objects
   var objectsList: ArrayBuffer[objects.Object] = new ArrayBuffer[objects.Object]() //Needed to specify the package
   var battery: Battery = _
   var heal: Heal = _
   var bolt: Bolt = _
+  var ship: Ship = _
   //Music player
   var music: MusicPlayer = _
 
@@ -79,6 +83,10 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     // Charger la map
     val loadedMap = assets.getMap()
     levelManager.load(loadedMap)
+
+    //Get the spawnable tiles
+    var spawnableTiles = levelManager.getListSpawnable()
+    println(spawnableTiles.mkString(","))
 
     // Créer le player au centre de la map
     val playerTexture = assets.getPlayerTexture()
@@ -98,26 +106,28 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     val healTexture = assets.getHealTexture()
     val boltTexture = assets.getBoltTexture()
     val waterTexture = assets.getWaterTexture()
+    val shipTexture = assets.getShipTexture()
 
     //Generate 15 items in the map
-    for(i <- 0 to 14){
-      var chances: Int = (math.random() * 100).toInt
+    println(s"player's spawn position : ${player.x}/${player.y}")
+    var shuffleSpawn = Random.shuffle(spawnableTiles)
+    println(s"the size of the list : ${shuffleSpawn.size}")
+    for(i <- 0 to 99){
+      var chances: Int = Random.nextInt(100)
 
-      var posX = (math.random() * 1000).toInt
-      var posY = (math.random() * 1000).toInt
+      val (tileX, tileY) = shuffleSpawn(i)
 
-      while(posY > 6500){
-        posY = (math.random() * 1000).toInt
-      }
+      shuffleSpawn.remove(i)
 
-      while(posX > 3200){
-        posX= (math.random() * 1000).toInt
-      }
+      // L'axe X ne change pas (la gauche reste la gauche)
+      val posX = (tileX * levelManager.getTileWidth()) + (levelManager.getTileWidth() / 2f)
+
+      // L'axe Y est inversé : on part du haut et on descend
+      val posY = ((levelManager.getTotalHeight() - 1 - tileY) * levelManager.getTileHeight()) + (levelManager.getTileHeight() / 2f)
 
       if(chances <= 60){
-        var fithy = (math.random()*100).toInt
-        println(fithy)
-        if(fithy >= 50){
+        var fithy = Random.nextInt(100)
+        if(fithy <= 50){
           objectsList.append(new Bolt(posX, posY, boltTexture, 32, 45f))
         }else {
           objectsList.append(new Water(posX, posY, waterTexture, 32, 45f))
@@ -128,15 +138,18 @@ class LethalMudry extends PortableApplication(1920, 1080) {
         objectsList.append(new Battery(posX, posY, batteryTexture, 32, 45f))
       }
 
-      println(s"the object is at ${posX}/${posY}")
+      println(s"the object (${objectsList(i).getClass.getSimpleName}) is at ${posX}/${posY}")
     }
 
     battery = new Battery(player.x + 250f, player.y + 50f, batteryTexture, 32f, 45f)
     heal = new Heal(player.x + 270f, player.y + 234f, healTexture, 32, 45f)
     bolt = new Bolt(player.x + 570f, player.y + 234f, boltTexture, 32, 45f)
+    ship = new Ship(1920/2, 1080/4,600,400,shipTexture)
+
     objectsList.append(battery)
     objectsList.append(heal)
     objectsList.append(bolt)
+    objectsList.append(ship)
 
     //Créer la barre de recharge de la lumière et ajouter les styles
     atlas = new TextureAtlas(Gdx.files.internal("data/styles/lightBar/barStyle.atlas"))
@@ -172,23 +185,34 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     inventoryBar.setValue(0f)
     inventoryBar.getStyle.knobBefore.setMinWidth(0f)
 
+    quotaBar = new ProgressBar(0f, 400f, 1f, false, inventorySkin, "mana")
+    quotaBar.setSize(500f,30f)
+    quotaBar.setAnimateDuration(0.2f)
+    quotaBar.setValue(0f)
+    quotaBar.getStyle.knobBefore.setMinWidth(0f)
+
     //Ajouter les positions des bars
-    lightBar.setPosition(20f, Gdx.graphics.getHeight - 180f)
-    healthBar.setPosition(20f, Gdx.graphics.getHeight - 130f)
+    lightBar.setPosition(20f, Gdx.graphics.getHeight - 235f)
+    healthBar.setPosition(20f, Gdx.graphics.getHeight - 125f)
     inventoryBar.setPosition((Gdx.graphics.getWidth - inventoryBar.getWidth) /2, 20f)
+    quotaBar.setPosition(20f, Gdx.graphics.getHeight - 165f)
 
     //Init the stage and config it
     stage = new Stage(new ScreenViewport())
     stage.addActor(lightBar)
     stage.addActor(healthBar)
     stage.addActor(inventoryBar)
+    stage.addActor(quotaBar)
 
     //Init the music player
     music = new MusicPlayer("data/music/lethalOST.mp3")
     music.play()
+    gameOver.onInit()
+    menu.onInit()
   }
 
   override def onGraphicRender(g: GdxGraphics): Unit = {
+    if(healthBar.getValue <= 0) deathOn = true
     if(menuOn){
       menu.onGraphicRender(g)
       if(Gdx.input.isKeyPressed(Input.Keys.ENTER)){
@@ -197,7 +221,17 @@ class LethalMudry extends PortableApplication(1920, 1080) {
       else{
         menuOn = true
       }
-    }else{
+    }else if(deathOn) {
+      gameOver.onGraphicRender(g)
+      if(Gdx.input.isKeyPressed(Input.Keys.ENTER)){
+        deathOn = false
+        healthBar.setValue(100f)
+        inventoryBar.setValue(0f)
+        quotaBar.setValue(0f)
+      } else {
+        deathOn = true
+      }
+    } else {
     g.clear()
 
     // Inputs
@@ -213,17 +247,17 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     player.update(delta, dx, dy)
     playerHitBox.setX(player.x)
     playerHitBox.setY(player.y)
-    println(s"the player is at : ${player.x}/${player.y}")
 
     // Caméra centrée sur le player
     val camera: OrthographicCamera = g.getCamera
     camera.position.set(player.x + 64, player.y + 64, 0)
-    g.zoom(0.25f)
+    g.zoom(0.50f)
     camera.update()
 
     // --- Rendu map puis player ---
     levelManager.render(camera)
     player.render(g)
+    ship.render(g)
 
     for(o <- objectsList){
       o.render(g)
@@ -231,12 +265,32 @@ class LethalMudry extends PortableApplication(1920, 1080) {
 
     //On vide le "sac" de dessins avant de passer à la lumière
     g.sbFlush()
-    objectsList.filterInPlace({o =>
-      if(playerHitBox.overlaps(o.hitbox)) {
-        o.collect(player, this)
-        var notif = new PopUp(s"Vous avez ramasser un/e ${o.getClass.getSimpleName}", stage)
 
-        false
+    objectsList.filterInPlace({ o =>
+      if (playerHitBox.overlaps(o.hitbox)) {
+        if (o.isInstanceOf[Ship]) {
+          // Le vaisseau vide l'inventaire
+          o.collect(player, this)
+          new PopUp("Objects returned successfully to the ship", stage)
+          true // Le ship reste dans la liste, ne pas le supprimer !
+
+        } else if (o.isInstanceOf[Heal] || o.isInstanceOf[Battery]) {
+          // Consommables directs, pas dans l'inventaire
+          o.collect(player, this)
+          new PopUp(s"Vous avez ramassé un/e ${o.getClass.getSimpleName}", stage)
+          false
+
+        } else {
+          // Objets d'inventaire (Bolt, Water, etc.)
+          if (inventoryBar.getValue != 100f) {
+            o.collect(player, this)
+            new PopUp(s"You collected a ${o.getClass.getSimpleName}", stage)
+            false
+          } else {
+            new PopUp("Votre inventaire est plein!", stage)
+            true
+          }
+        }
       } else {
         true
       }
