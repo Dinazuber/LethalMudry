@@ -83,4 +83,7 @@ La bibliothèque `gdx2d` est incluse directement dans le dossier `libs/`. Les so
 ## 🎥 Gameplay
 
 Voici une vidéo de 15 secondes résumant notre jeu :
-https://github.com/user-attachments/assets/3ca71ca4-7e1e-4469-8985-fab75fba5f92
+
+https://github.com/user-attachments/assets/0fd85f9c-0cd3-439c-9c85-4d130981bb6a
+
+
