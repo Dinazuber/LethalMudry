@@ -78,6 +78,7 @@ class LethalMudry extends PortableApplication(1920, 1080) {
   var healTexture : Texture = _
   var boltTexture : Texture = _
   var waterTexture : Texture = _
+  var shipTexture: Texture = _
 
   //Get enemies textures
   var spiderTexture : Texture = _
@@ -107,6 +108,7 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     healTexture = assets.getHealTexture()
     boltTexture = assets.getBoltTexture()
     waterTexture = assets.getWaterTexture()
+    shipTexture = assets.getShipTexture()
 
     //Get enemies textures
     spiderTexture = assets.getSpiderTexture()
@@ -141,7 +143,7 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     battery = new Battery(player.x + 250f, player.y + 50f, batteryTexture, 32f, 45f)
     heal = new Heal(player.x + 270f, player.y + 234f, healTexture, 32, 45f)
     bolt = new Bolt(player.x + 570f, player.y + 234f, boltTexture, 32, 45f)
-    ship = new Ship(1920/2, 1080/4,600,400,shipTexture)
+    ship = new Ship(1920/2, 1080/4,600,400, shipTexture)
 
     objectsList.append(battery)
     objectsList.append(heal)
@@ -311,7 +313,13 @@ class LethalMudry extends PortableApplication(1920, 1080) {
         g.sbFlush()
       objectsList.filterInPlace({ o =>
         if (playerHitBox.overlaps(o.hitbox)) {
-          if (!o.isInstanceOf[Heal] && !o.isInstanceOf[Battery]) {
+          if (o.isInstanceOf[Ship]) {
+            // Le vaisseau vide l'inventaire
+            o.collect(player, this)
+            new PopUp("Objects returned successfully to the ship", stage)
+            true // Le ship reste dans la liste, ne pas le supprimer !
+
+          } else if (!o.isInstanceOf[Heal] && !o.isInstanceOf[Battery]) {
             println(s"this objet is an ${o.getClass.getSimpleName}")
             //If the objet in collision is not a heal or a battery
             if (inventoryBar.getValue != 100f) {
