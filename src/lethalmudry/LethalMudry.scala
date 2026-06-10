@@ -143,7 +143,7 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     battery = new Battery(player.x + 250f, player.y + 50f, batteryTexture, 32f, 45f)
     heal = new Heal(player.x + 270f, player.y + 234f, healTexture, 32, 45f)
     bolt = new Bolt(player.x + 570f, player.y + 234f, boltTexture, 32, 45f)
-    ship = new Ship(1920/2, 1080/4,600,400, shipTexture)
+    ship = new Ship(player.x - (shipTexture.getWidth / 2), player.y - 1000f,600,400, shipTexture)
 
     objectsList.append(battery)
     objectsList.append(heal)
@@ -197,10 +197,10 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     quotaBar.getStyle.knobBefore.setMinWidth(0f)
 
     //Ajouter les positions des bars
-    lightBar.setPosition(20f, Gdx.graphics.getHeight - 235f)
+    lightBar.setPosition(20f, Gdx.graphics.getHeight - 165f)
     healthBar.setPosition(20f, Gdx.graphics.getHeight - 125f)
     inventoryBar.setPosition((Gdx.graphics.getWidth - inventoryBar.getWidth) /2, 20f)
-    quotaBar.setPosition(20f, Gdx.graphics.getHeight - 165f)
+    quotaBar.setPosition(Gdx.graphics.getWidth - quotaBar.getWidth - 20f, Gdx.graphics.getHeight - 95f)
 
     //Init the stage and config it
     stage = new Stage(new ScreenViewport())
