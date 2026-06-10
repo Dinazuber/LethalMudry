@@ -1,5 +1,6 @@
 package ch.hevs.gdx2d.lethalmudry {
 
+  import com.badlogic.gdx.Gdx
   import com.badlogic.gdx.assets.AssetManager
   import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
   import com.badlogic.gdx.graphics.Texture
@@ -18,6 +19,7 @@ package ch.hevs.gdx2d.lethalmudry {
     private val SPIDER_PATH = "data/images/enemies/spider_animate.png"
     private val MUDRY_PATH = "data/images/enemies/saint-mudry.png"
     private val WOLF_PATH = "data/images/enemies/wolf.png"
+    private val SHIP_PATH = "data/images/SpaceShip.png"
 
     /**
      * Load all the sprite of the game's items
@@ -33,6 +35,7 @@ package ch.hevs.gdx2d.lethalmudry {
       manager.load(SPIDER_PATH, classOf[Texture])
       manager.load(MUDRY_PATH, classOf[Texture])
       manager.load(WOLF_PATH, classOf[Texture])
+      manager.load(SHIP_PATH, classOf[Texture])
     }
 
     /**
@@ -105,6 +108,10 @@ package ch.hevs.gdx2d.lethalmudry {
 
     def getWolfTexture(): Texture = {
       manager.get(WOLF_PATH, classOf[Texture])
+    }
+      
+    def getShipTexture(): Texture = {
+      manager.get(SHIP_PATH, classOf[Texture])
     }
 
     override def dispose(): Unit = {

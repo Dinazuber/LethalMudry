@@ -8,8 +8,7 @@ import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.graphics.{OrthographicCamera, Texture}
 import com.badlogic.gdx.math.Rectangle
-import lethalmudry.LevelManager
-import lethalmudry.Light
+import lethalmudry.{Counter, LevelManager, Light, PopUp}
 import lethalmudry.ui.menu.MenuScreen
 import lethalmudry.ui.menu.DeathScreen
 import com.badlogic.gdx.scenes.scene2d.Stage
@@ -18,7 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar
 import com.badlogic.gdx.utils.viewport.ScreenViewport
 import lethalmudry.Enemies.{DemonMudry, Enemies, Spider, Wolf}
 import lethalmudry.{Counter, LevelManager, Light, PopUp}
-import objects.{Battery, Bolt, Heal, Water}
+import objects.{Battery, Bolt, Heal, Ship, Water}
 
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
@@ -44,7 +43,7 @@ class LethalMudry extends PortableApplication(1920, 1080) {
   var playerHitBox: Rectangle = _
   var light: Light = _
   var lastClickedTime: Long = 0L
-   var menuOn: Boolean = true //If the player is in the menu or not
+  var menuOn: Boolean = true //If the player is in the menu or not
   var deathOn: Boolean = false //if the player is dead or not
 
   //Style Health Bar
@@ -66,6 +65,7 @@ class LethalMudry extends PortableApplication(1920, 1080) {
   var inventoryAtlas: TextureAtlas = _
   var inventorySkin : Skin = _
   var inventoryBar : ProgressBar = _
+  var quotaBar: ProgressBar = _
 
   //Game objects
   var objectsList: ArrayBuffer[objects.Object] = new ArrayBuffer[objects.Object]() //Needed to specify the package
@@ -91,6 +91,7 @@ class LethalMudry extends PortableApplication(1920, 1080) {
   var enemiesList : ArrayBuffer[Enemies] = new ArrayBuffer[Enemies]()
   var mudry: DemonMudry = _
 
+  var ship: Ship = _
   //Music player
   var music: MusicPlayer = _
   var ouch: MusicPlayer = _
@@ -140,9 +141,12 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     battery = new Battery(player.x + 250f, player.y + 50f, batteryTexture, 32f, 45f)
     heal = new Heal(player.x + 270f, player.y + 234f, healTexture, 32, 45f)
     bolt = new Bolt(player.x + 570f, player.y + 234f, boltTexture, 32, 45f)
+    ship = new Ship(1920/2, 1080/4,600,400,shipTexture)
+
     objectsList.append(battery)
     objectsList.append(heal)
     objectsList.append(bolt)
+    objectsList.append(ship)
 
     //Show the first enemy
     mudry = new DemonMudry(20, player.x + 250f, player.y - 50f, 64f, 64f, mudryTexture)
@@ -184,16 +188,24 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     inventoryBar.setValue(0f)
     inventoryBar.getStyle.knobBefore.setMinWidth(0f)
 
+    quotaBar = new ProgressBar(0f, 400f, 1f, false, inventorySkin, "mana")
+    quotaBar.setSize(500f,30f)
+    quotaBar.setAnimateDuration(0.2f)
+    quotaBar.setValue(0f)
+    quotaBar.getStyle.knobBefore.setMinWidth(0f)
+
     //Ajouter les positions des bars
-    lightBar.setPosition(20f, Gdx.graphics.getHeight - 180f)
-    healthBar.setPosition(20f, Gdx.graphics.getHeight - 130f)
+    lightBar.setPosition(20f, Gdx.graphics.getHeight - 235f)
+    healthBar.setPosition(20f, Gdx.graphics.getHeight - 125f)
     inventoryBar.setPosition((Gdx.graphics.getWidth - inventoryBar.getWidth) /2, 20f)
+    quotaBar.setPosition(20f, Gdx.graphics.getHeight - 165f)
 
     //Init the stage and config it
     stage = new Stage(new ScreenViewport())
     stage.addActor(lightBar)
     stage.addActor(healthBar)
     stage.addActor(inventoryBar)
+    stage.addActor(quotaBar)
 
     //Init the music player
     music = new MusicPlayer("data/music/lethalOST.mp3")
@@ -231,6 +243,7 @@ class LethalMudry extends PortableApplication(1920, 1080) {
         enemiesList.empty
         spawnRandomObject(spawnableTiles)
         spawnEnemies(spawnableTiles)
+        quotaBar.setValue(0f)
       } else {
         deathOn = true
       }
