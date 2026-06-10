@@ -269,7 +269,7 @@ class LethalMudry extends PortableApplication(1920, 1080) {
       // Caméra centrée sur le player
       val camera: OrthographicCamera = g.getCamera
       camera.position.set(player.x + 64, player.y + 64, 0)
-      //g.zoom(0.25f)
+      g.zoom(0.25f)
       camera.update()
 
       // --- Rendu map puis player ---
