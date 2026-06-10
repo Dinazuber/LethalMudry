@@ -1,5 +1,6 @@
 package ch.hevs.gdx2d.lethalmudry {
 
+  import com.badlogic.gdx.Gdx
   import com.badlogic.gdx.assets.AssetManager
   import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
   import com.badlogic.gdx.graphics.Texture
@@ -15,7 +16,14 @@ package ch.hevs.gdx2d.lethalmudry {
     private val HEAL_PATH = "data/images/heal.png"
     private val BOLT_PATH = "data/images/scrap/big_bolt.png"
     private val WATER_PATH = "data/images/scrap/water.png"
+    private val SPIDER_PATH = "data/images/enemies/spider_animate.png"
+    private val MUDRY_PATH = "data/images/enemies/saint-mudry.png"
+    private val WOLF_PATH = "data/images/enemies/wolf.png"
+    private val SHIP_PATH = "data/images/SpaceShip.png"
 
+    /**
+     * Load all the sprite of the game's items
+     */
     def loadAll(): Unit = {
       manager.setLoader(classOf[TiledMap], new TmxMapLoader(new InternalFileHandleResolver))
       manager.load(MAP_PATH, classOf[TiledMap])
@@ -24,34 +32,86 @@ package ch.hevs.gdx2d.lethalmudry {
       manager.load(HEAL_PATH, classOf[Texture])
       manager.load(BOLT_PATH, classOf[Texture])
       manager.load(WATER_PATH, classOf[Texture])
+      manager.load(SPIDER_PATH, classOf[Texture])
+      manager.load(MUDRY_PATH, classOf[Texture])
+      manager.load(WOLF_PATH, classOf[Texture])
+      manager.load(SHIP_PATH, classOf[Texture])
     }
 
+    /**
+     * Update the loading of the
+     * @return return true when it's loaded?
+     */
     def updateLoading(): Boolean = {
       manager.update()
     }
 
+    /**
+     * Get the sprite of the player
+     * @return the Texture of the player
+     */
     def getPlayerTexture(): Texture = {
       manager.get(PLAYER_PATH, classOf[Texture])
     }
 
+    /**
+     * Get the sprite of the map
+     * @return the Texture of the map
+     */
     def getMap(): TiledMap = {
       manager.get(MAP_PATH, classOf[TiledMap])
     }
 
+    /**
+     * Get the sprite of the battery
+     * @return the Texture of the battery
+     */
     def getBatteryTexture(): Texture = {
       manager.get(BATTERY_PATH, classOf[Texture])
     }
 
+    /**
+     * Get the sprite of an heal
+     * @return the Texture of an heal
+     */
     def getHealTexture(): Texture = {
       manager.get(HEAL_PATH, classOf[Texture])
     }
 
+    /**
+     * Get the sprite of the bolt
+     * @return the Texture of the bolt
+     */
     def getBoltTexture(): Texture = {
       manager.get(BOLT_PATH, classOf[Texture])
     }
 
+    /**
+     * Get the sprite of the bottle of water
+     * @return the Texture of the bottle of water
+     */
     def getWaterTexture(): Texture = {
       manager.get(WATER_PATH, classOf[Texture])
+    }
+
+    /**
+     * Get the sprite of the spider
+     * @return the Texture of the spider
+     */
+    def getSpiderTexture(): Texture = {
+      manager.get(SPIDER_PATH, classOf[Texture])
+    }
+
+    def getMudryTexture(): Texture = {
+      manager.get(MUDRY_PATH, classOf[Texture])
+    }
+
+    def getWolfTexture(): Texture = {
+      manager.get(WOLF_PATH, classOf[Texture])
+    }
+      
+    def getShipTexture(): Texture = {
+      manager.get(SHIP_PATH, classOf[Texture])
     }
 
     override def dispose(): Unit = {

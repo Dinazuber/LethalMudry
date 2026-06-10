@@ -6,8 +6,8 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import lethalmudry.LevelManager
 
 class Player(texture: Texture, startX: Float, startY: Float, level: LevelManager) {
-  private val SPRITE_WIDTH  = 85
-  private val SPRITE_HEIGHT = 120
+  private val SPRITE_WIDTH  = 90
+  private val SPRITE_HEIGHT = 121
   private var headDirection = 90f //Regarde en haut par défaut
 
   private val FRAMES: Array[Array[TextureRegion]] =
@@ -15,7 +15,7 @@ class Player(texture: Texture, startX: Float, startY: Float, level: LevelManager
 
   var x: Float = startX
   var y: Float = startY
-  val speed: Float = 150f
+  val speed: Float = 175f
 
   var stateTime: Float     = 0f
   val frameDuration: Float = 0.25f
@@ -102,7 +102,7 @@ class Player(texture: Texture, startX: Float, startY: Float, level: LevelManager
   def getPosX(posX: Float): Float = { x = posX; x }
   def getPosY(posY: Float): Float  = { y = posY; y }
 
-  private def isHitboxColliding(testX: Float, testY: Float): Boolean = {
+  def isHitboxColliding(testX: Float, testY: Float): Boolean = {
     val boxLeft   = testX + hitOffsetX
     val boxRight  = boxLeft  + hitWidth
     val boxBottom = testY + hitOffsetY
