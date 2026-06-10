@@ -48,6 +48,34 @@ LethalMudry/
 ├── gdx2d-lethalmudry.iml
 └── README.md
 ```
+---
+
+## 🕹️ Gameplay
+Lethal Mudry, inspiré du vrai jeu LethalCompany 
+est un jeu d'horreur où un employée
+explore des planètes abandonnées 
+pour récupérer des ressources tout en évitant de 
+nombreuses créatures dangereuses afin d'atteindre 
+les quotas fixés par l'entreprise.
+
+### Contrôles
+Le joueur peut se déplacer avec les touches du claviers.
+- W pour aller vers le haut
+- A pour aller à gauche
+- S pour aller vers le bas
+- D pour aller à droite
+
+
+### Eléments graphiques
+
+Le joueur peut également allumé ou éteindre la lumière de sa lampe de torche en cliquant sur "clique droit". Si la bar blanche 
+est vide, la lampe n'est pas disponible pour le joueur
+
+Au milieu en bas de l'écran, la barre bleu correspond à la place de son inventaire.
+Si celle-ci est remplie, il ne pourra plus prendre d'autres objets.
+
+En haut à droite se trouve la même barre, mais celle-ci représente le quota que le joueur doit remplir pour gagner la partie. 
+
 
 ---
 
@@ -78,7 +106,7 @@ La bibliothèque `gdx2d` est incluse directement dans le dossier `libs/`. Les so
 - **Dina Zuber** — développement principal
 - **Noah Abraão** - développement principal
 
----
+-----
 
 ## 🎥 Gameplay
 
