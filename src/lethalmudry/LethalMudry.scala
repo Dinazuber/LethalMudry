@@ -246,6 +246,9 @@ class LethalMudry extends PortableApplication(1920, 1080) {
         spawnRandomObject(spawnableTiles)
         spawnEnemies(spawnableTiles)
         quotaBar.setValue(0f)
+
+        //Reset mudry
+        mudry.setPosition(player.x + 250f, player.y - 50f)
       } else {
         deathOn = true
       }
