@@ -1,0 +1,16 @@
+{
+	"com.badlogic.gdx.scenes.scene2d.ui.ProgressBar$ProgressBarStyle": {
+		"default-horizontal": {
+			"background": "progress-bar-horizontal",
+			"knobBefore": "progress-bar-horizontal-knob"
+		},
+		"default-vertical": {
+			"background": "progress-bar-vertical",
+			"knobBefore": "progress-bar-vertical-knob"
+		},
+		"mana": {
+			"background": "progress-bar-mana",
+			"knobBefore": "progress-bar-mana-knob"
+		}
+	}
+}
