@@ -17,7 +17,7 @@ import lethalmudry.Counter
  * @param height the height of the sprite
  */
 class Spider(hp: Float, posX: Float, posY: Float, width: Float, height: Float, texture: Texture)
-  extends Enemies(hp, posX, posY, width, height, texture) {
+  extends Enemies(hp, posX, posY, width, height, 1.5f, texture) {
   override def attack(healthBar: ProgressBar): Unit = {
     println(s"The spider just attacked you!")
     healthBar.setValue(healthBar.getValue - 10)

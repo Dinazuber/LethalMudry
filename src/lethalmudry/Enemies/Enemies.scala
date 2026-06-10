@@ -7,7 +7,7 @@ import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar
 import lethalmudry.Counter
 
-abstract class Enemies(hp: Float, posX: Float, posY: Float, width: Float, height: Float, texture: Texture) {
+abstract class Enemies(hp: Float, posX: Float, posY: Float, width: Float, height: Float, speed: Float, texture: Texture) {
   val FRAME_WIDTH = texture.getWidth / 2 //2 column for the sprite
   val FRAME_HEIGHT = texture.getHeight / 4 //4 rows for the sprite
 
@@ -46,10 +46,14 @@ abstract class Enemies(hp: Float, posX: Float, posY: Float, width: Float, height
     return distCarree <= rangeCarree
   }
 
+  def setPosition(x: Float, y: Float): Unit = {
+    hitbox.x = x
+    hitbox.y = y
+  }
+
   def trackPlayer(player: Player): Unit = {
     val diffX = player.x - hitbox.x //diff of X of player and enemy
     val diffY = player.y - hitbox.y //diff of Y of player and enemy
-    val speed: Float = 1.5f
 
     //Update X position
     var nextX = hitbox.x

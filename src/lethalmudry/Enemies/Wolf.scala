@@ -6,7 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar
 import lethalmudry.Counter
 
 class Wolf(hp: Float, posX: Float, posY: Float, width: Float, height: Float, texture: Texture)
-  extends Enemies(hp, posX, posY, width, height, texture) {
+  extends Enemies(hp, posX, posY, width, height, 1f, texture) {
 
   override def attack(healthBar: ProgressBar): Unit = {
     healthBar.setValue(healthBar.getValue - 25)
