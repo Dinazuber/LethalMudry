@@ -16,7 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar
 import com.badlogic.gdx.utils.viewport.ScreenViewport
-import lethalmudry.Enemies.{DemonMudry, Enemies, Spider}
+import lethalmudry.Enemies.{DemonMudry, Enemies, Spider, Wolf}
 import lethalmudry.{Counter, LevelManager, Light, PopUp}
 import objects.{Battery, Bolt, Heal, Water}
 
@@ -82,12 +82,13 @@ class LethalMudry extends PortableApplication(1920, 1080) {
   //Get enemies textures
   var spiderTexture : Texture = _
   var mudryTexture : Texture = _
+  var wolfTexture: Texture = _
 
   //Objects list
   var spawnableTiles: ArrayBuffer[(Int, Int)] = _
 
   //Game enemies
-  var spider: Spider = _
+  var enemiesList : ArrayBuffer[Enemies] = new ArrayBuffer[Enemies]()
   var mudry: DemonMudry = _
 
   //Music player
@@ -109,7 +110,7 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     //Get enemies textures
     spiderTexture = assets.getSpiderTexture()
     mudryTexture = assets.getMudryTexture()
-
+    wolfTexture = assets.getWolfTexture()
 
     // Charger la map
     val loadedMap = assets.getMap()
@@ -134,6 +135,7 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     light.generateLight()
 
     spawnRandomObject(spawnableTiles)
+    spawnEnemies(spawnableTiles)
 
     battery = new Battery(player.x + 250f, player.y + 50f, batteryTexture, 32f, 45f)
     heal = new Heal(player.x + 270f, player.y + 234f, healTexture, 32, 45f)
@@ -143,8 +145,8 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     objectsList.append(bolt)
 
     //Show the first enemy
-    spider = new Spider(20, player.x + 250f, player.y + 50f, 64f, 64f, spiderTexture)
     mudry = new DemonMudry(20, player.x + 250f, player.y - 50f, 64f, 64f, mudryTexture)
+    enemiesList.append(mudry)
 
     //Créer la barre de recharge de la lumière et ajouter les styles
     atlas = new TextureAtlas(Gdx.files.internal("data/styles/lightBar/barStyle.atlas"))
@@ -159,10 +161,9 @@ class LethalMudry extends PortableApplication(1920, 1080) {
 
     //Start one second counter (to decrease light battery
     counterManager.startCounter()
-    spider.startCounterTimeOut()
-    mudry.startCounterTimeOut()
-    println(spider.getTimeOut())
-
+    for(e <- enemiesList){
+      e.startCounterTimeOut()
+    }
     //Créer la barre de vie du personnage
     healthAtlas = new TextureAtlas(Gdx.files.internal("data/styles/healthBar/healthBar.atlas"))
     healthSkin = new Skin(Gdx.files.internal("data/styles/healthBar/healthBar.json"), healthAtlas)
@@ -225,8 +226,11 @@ class LethalMudry extends PortableApplication(1920, 1080) {
         inventoryBar.setValue(0f)
         lightBar.setValue(100f)
 
-        //Reset objects spawning
+        //Reset objects and enemies spawning
+        objectsList.empty
+        enemiesList.empty
         spawnRandomObject(spawnableTiles)
+        spawnEnemies(spawnableTiles)
       } else {
         deathOn = true
       }
@@ -261,9 +265,15 @@ class LethalMudry extends PortableApplication(1920, 1080) {
         o.render(g)
       }
 
+      for(e <- enemiesList){
+        e.render(g)
+      }
+
       //Show the first enemy
-      if(spider.inRange(player)){
-        spider.trackPlayer(player)
+      for(e <- enemiesList){
+        if(e.inRange(player)){
+          e.trackPlayer(player)
+        }
       }
       //spider.render(g) //and update the render
 
@@ -273,12 +283,14 @@ class LethalMudry extends PortableApplication(1920, 1080) {
       }
       mudry.render(g)
 
-      if(playerHitBox.overlaps(mudry.hitbox)){
-        var currentTime = System.currentTimeMillis()
-        if((currentTime - spider.getTimeOut()) >= 1000) {
-          spider.resetTime()
-          println(s"a second past + the spider attacked the player")
-          spider.attack(healthBar)
+      for(e <- enemiesList){
+        if(playerHitBox.overlaps(e.hitbox)){
+          var currentTime = System.currentTimeMillis()
+          if(currentTime - e.getTimeOut() >= 1000){
+            e.resetTime()
+            println(s"a second past + the ${e.getClass.getSimpleName} attacked the player")
+            e.attack(healthBar)
+          }
         }
       }
 
@@ -407,15 +419,34 @@ class LethalMudry extends PortableApplication(1920, 1080) {
     }
   }
 
-  def spawnEnemies(enemy: Enemies): Unit = {
+  def spawnEnemies(validTiles : ArrayBuffer[(Int, Int)]): Unit = {
+    var shuffleSpawn = Random.shuffle(validTiles)
     val maxW = levelManager.getTotalWidth() * levelManager.getTileWidth()
     val maxH = levelManager.getTotalHeight() * levelManager.getTileHeight()
 
-    val posX = Random.nextFloat() * maxW
-    val posY = Random.nextFloat() * maxH
+    for(i <- 0 to 29){
+      var chances = Random.nextInt(100)
+      var rdmValidTiles = Random.nextInt()
+      var enemy: Enemies = null
 
-    if(!levelManager.collisions(posX, posY)){
+      var (tileX, tileY) = shuffleSpawn(i)
 
+      val posX = (tileX * levelManager.getTileWidth()) + (levelManager.getTileWidth() / 2f)
+      val posY = ((levelManager.getTotalHeight() - 1 - tileY) * levelManager.getTileHeight()) + (levelManager.getTileHeight() / 2f)
+
+      if(chances <= 50){
+        enemy = new Wolf(100, posX, posY, 64, 64, wolfTexture)
+      } else if(chances <= 100){
+        enemy = new Spider(100, posX, posY, 64, 64, spiderTexture)
+      }
+
+      if(enemy != null){
+        if(!levelManager.collisions(posX, posY)){
+          enemy.setPosition(posX, posY)
+          enemiesList.append(enemy)
+          println(s"the enemy ${enemy.getClass.getSimpleName} spawn at ${posX}/${posY}")
+        }
+      }
     }
   }
 }

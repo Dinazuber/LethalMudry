@@ -32,6 +32,7 @@ package ch.hevs.gdx2d.lethalmudry {
       manager.load(WATER_PATH, classOf[Texture])
       manager.load(SPIDER_PATH, classOf[Texture])
       manager.load(MUDRY_PATH, classOf[Texture])
+      manager.load(WOLF_PATH, classOf[Texture])
     }
 
     /**
@@ -102,7 +103,7 @@ package ch.hevs.gdx2d.lethalmudry {
       manager.get(MUDRY_PATH, classOf[Texture])
     }
 
-    def getWoldTexture(): Texture = {
+    def getWolfTexture(): Texture = {
       manager.get(WOLF_PATH, classOf[Texture])
     }
 
