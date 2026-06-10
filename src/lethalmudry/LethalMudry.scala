@@ -211,6 +211,7 @@ class LethalMudry extends PortableApplication(1920, 1080) {
 
     //Init the music player
     music = new MusicPlayer("data/music/lethalOST.mp3")
+    ouch = new MusicPlayer("data/audio/classic_hurt.mp3")
     music.play()
     gameOver.onInit()
     menu.onInit()
@@ -308,6 +309,7 @@ class LethalMudry extends PortableApplication(1920, 1080) {
             e.resetTime()
             println(s"a second past + the ${e.getClass.getSimpleName} attacked the player")
             e.attack(healthBar)
+            ouch.play()
           }
         }
       }
