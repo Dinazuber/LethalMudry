@@ -1,8 +1,16 @@
 package lethalmudry.Enemies
 
-class DemonMudry extends Enemies {
-  hp = 100
-  speed = 100
-  damages = 50
-  spawnIn = true
+import ch.hevs.gdx2d.lib.GdxGraphics
+import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar
+import lethalmudry.Counter
+
+class DemonMudry(hp: Float, posX: Float, posY: Float, width: Float, height: Float, texture: Texture)
+  extends Enemies(hp, posX, posY, width, height, 0.8f, texture) {
+
+  override def attack(healthBar: ProgressBar): Unit = {
+    healthBar.setValue(healthBar.getValue - 100)
+  }
+
+  override def render(g: GdxGraphics): Unit = super.render(g)
 }

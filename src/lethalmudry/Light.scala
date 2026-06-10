@@ -58,7 +58,7 @@ class Light(x: Float, y : Float) {
     rayHandler.setCulling(true)
     rayHandler.setShadows(true)
     rayHandler.setBlur(true)
-    rayHandler.setAmbientLight(0.2f)
+    rayHandler.setAmbientLight(0.3f)
   }
 
   /**

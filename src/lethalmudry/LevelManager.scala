@@ -45,6 +45,10 @@ package lethalmudry {
       mapHeight
     }
 
+    def getTotalWidth(): Int = {
+      mapWidth
+    }
+
     def getTileWidth(): Int = {
       tileWidth
     }
